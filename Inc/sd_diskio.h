@@ -18,6 +18,8 @@
   */
 /* USER CODE END Header */
 
+/* Note: code generation based on sd_diskio_dma_rtos_template.h */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SD_DISKIO_H
 #define __SD_DISKIO_H
