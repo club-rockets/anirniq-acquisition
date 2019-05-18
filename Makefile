@@ -36,6 +36,17 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
+app/app_altitude.c \
+../shared/drivers/barometer/barometer.c \
+../shared/middleware/kalman/kalman.c \
+../shared/middleware/arm_matrix/arm_mat_add_f32.c \
+../shared/middleware/arm_matrix/arm_mat_cmplx_mult_f32.c \
+../shared/middleware/arm_matrix/arm_mat_init_f32.c \
+../shared/middleware/arm_matrix/arm_mat_inverse_f32.c \
+../shared/middleware/arm_matrix/arm_mat_mult_f32.c \
+../shared/middleware/arm_matrix/arm_mat_scale_f32.c \
+../shared/middleware/arm_matrix/arm_mat_sub_f32.c \
+../shared/middleware/arm_matrix/arm_mat_trans_f32.c \
 Src/main.c \
 Src/gpio.c \
 Src/syscalls.c \
@@ -48,7 +59,6 @@ Src/spi.c \
 Src/usart.c \
 Src/stm32f4xx_it.c \
 Src/stm32f4xx_hal_msp.c \
-../shared/drivers/mti/mti.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rtc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rtc_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c \
@@ -145,6 +155,7 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
+-I. \
 -IInc \
 -IDrivers/STM32F4xx_HAL_Driver/Inc \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
@@ -152,6 +163,7 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
 -I../shared/drivers \
+-I../shared/middleware \
 -IMiddlewares/Third_Party/FreeRTOS/Source/include \
 -IMiddlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS \
 -IMiddlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F

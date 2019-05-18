@@ -31,7 +31,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "mti/mti.h"
+#include "app/app_altitude.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -102,19 +102,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
-  mti_t mti;
-  mti_config_t mti_config = {
-    .acceleration = 50,
-    .attitude = 0,
-    .delta_v = 0,
-    .temperature = 0,
-    .rate_of_turn = 0,
-    .magnetic_field = 0
-  };
-  mti_init(&mti, MTI_CS_GPIO_Port, MTI_CS_Pin, MTI_DRDY_GPIO_Port, MTI_DRDY_Pin, &hspi1, &mti_config);
-  uint32_t mti_count = 0;
-  uint32_t next_beat = HAL_GetTick() + 100;
-  HAL_GPIO_WritePin(BARO_CS_GPIO_Port, BARO_CS_Pin, GPIO_PIN_SET);
+  app_altitude_init();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -132,23 +120,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    if (next_beat < HAL_GetTick()) {
-      HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-      next_beat += 50;
-    }
-
-    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, HAL_GPIO_ReadPin(MTI_DRDY_GPIO_Port, MTI_DRDY_Pin));
-    if (HAL_GPIO_ReadPin(MTI_DRDY_GPIO_Port, MTI_DRDY_Pin)) {
-      mti_update(&mti);
-    }
-      //   f_mount(&sdfs, SDPath, 1);
-      //   f_open(&logfile, "acquisition.log", FA_OPEN_EXISTING | FA_CREATE_NEW );
-      //   f_puts("SD write success\n", &logfile);
-      //   f_close(&logfile);
-
-      //   next_sd_check = 0;
-      //   HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET);
-      // }
   }
   /* USER CODE END 3 */
 }
