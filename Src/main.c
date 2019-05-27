@@ -32,6 +32,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app/app_altitude.h"
+#include "app/app_heartbeat.h"
+#include "app/app_sd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -103,6 +105,8 @@ int main(void)
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
   app_altitude_init();
+  app_heartbeat_init();
+  app_sd_init();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -177,6 +181,9 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+    if (GPIO_Pin == SD_DETECT_Pin) {
+      app_sd_detect_handler();
+    }
 }
 /* USER CODE END 4 */
 

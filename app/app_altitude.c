@@ -27,11 +27,5 @@ void app_altitude()
         kalman_update(&kalman, pressure_to_altitude(barometer.pressure), 0, 0.020);
         osDelay(20);
         HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
-        if (barometer.pressure > 90000 && barometer.pressure < 110000) {
-            HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, GPIO_PIN_SET);
-        }
-        else {
-            HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, GPIO_PIN_RESET);
-        }
     }
 }

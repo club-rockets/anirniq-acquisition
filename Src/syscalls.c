@@ -1,3 +1,5 @@
+#include "stm32f4xx.h"
+
 int _write(int file, char *ptr, int len)
 {
     int i = 0;
