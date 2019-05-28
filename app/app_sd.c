@@ -14,7 +14,8 @@ static FIL datafile;
 
 static QueueHandle_t sd_events;
 
-static char buffer[512] = { 0 };
+static char line[128];
+static uint8_t buffer[512] = { 0 };
 static int cursor = 0;
 static int mounted = 0;
 
@@ -91,20 +92,34 @@ static void sd_mount()
 
 static void sd_write_data(sd_data_t* data)
 {
+    int size, left;
     if (!mounted) {
         return;
     }
 
-    sprintf(buffer, "%f\n", data->val);
-    sd_flush();
+    sprintf(line, "%f\n", data->val);
+    size = strlen(line);
+    left = 512 - cursor;
+
+    if (size > left) {
+        memcpy(buffer + cursor, line, left);
+        sd_flush();
+        cursor = size - left;
+        memcpy(buffer, line + left, cursor);
+        buffer[cursor + 1] = 0;
+    }
+    else {
+        memcpy(buffer + cursor, line, size);
+        cursor += size;
+    }
 
     return;
 }
 
 static void sd_flush()
 {
-    int bw;
-    f_printf(&datafile, "%s", buffer);
+    unsigned bw;
+    f_write(&datafile, buffer, 512, &bw);
     f_sync(&datafile);
     cursor = 0;
     HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
@@ -113,11 +128,12 @@ static void sd_flush()
 void app_sd_detect_handler()
 {
     sd_event_t event = { .data = NULL };
+    long int pd;
 
     if (!HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin)) {
         event.type = CARD_CONNECTED;
     } else {
         event.type = CARD_DISCONNECTED;
     }
-    xQueueSendFromISR(sd_events, &event, osWaitForever);
+    xQueueSendFromISR(sd_events, &event, &pd);
 }
