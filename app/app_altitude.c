@@ -1,4 +1,5 @@
 #include "app_altitude.h"
+#include "app_sd.h"
 
 #include "cmsis_os.h"
 
@@ -21,11 +22,14 @@ void app_altitude()
 
     kalman_t kalman;
     kalman_init(&kalman);
+    sd_data_t data;
 
     while (1) {
         barometer_update(&barometer);
         kalman_update(&kalman, pressure_to_altitude(barometer.pressure), 0, 0.020);
         osDelay(20);
+        data.val = kalman.altitude;
+        app_sd_write_data(&data);
         HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
     }
 }

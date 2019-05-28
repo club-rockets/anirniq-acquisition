@@ -4,67 +4,120 @@
 #include <string.h>
 
 #include "cmsis_os.h"
-#include "main.h"
 #include "fatfs.h"
 #include "ff.h"
+#include "main.h"
 
 static FATFS sdfs;
 static FIL logfile;
+static FIL datafile;
 
-static osMessageQId sd_events;
+static QueueHandle_t sd_events;
 
-void app_sd();
+static char buffer[512] = { 0 };
+static int cursor = 0;
+static int mounted = 0;
+
+static void app_sd();
+static void sd_mount();
+static void sd_flush();
+static void sd_write_data(sd_data_t* data);
 osThreadDef(sd, app_sd, osPriorityLow, 1, 2048);
 
 void app_sd_init()
 {
-    osMessageQDef(sdqueue, 10, uint16_t);
-    sd_events = osMessageCreate(osMessageQ(sdqueue), NULL);
-
+    sd_events = xQueueCreate(10, sizeof(sd_event_t));
     osThreadCreate(osThread(sd), NULL);
 }
 
-void app_sd()
+void app_sd_write_data(sd_data_t* data)
 {
-    osEvent event;
+    sd_event_t event = {
+        .type = DATA_READY,
+        .data = data
+    };
+    xQueueSend(sd_events, &event, osWaitForever);
+}
+
+static void app_sd()
+{
+    sd_event_t event;
 
     while (1) {
-        event = osMessageGet(sd_events, osWaitForever);
+        xQueueReceive(sd_events, &event, osWaitForever);
+        switch (event.type) {
+            case CARD_CONNECTED:
+                sd_mount();
+                mounted = 1;
+                break;
 
-        if (event.status == osEventMessage) {
-            switch(event.value.v) {
-                case CARD_CONNECTED:
-                    if (BSP_SD_Init() == MSD_OK) {
-                        if (f_mount(&sdfs, SDPath, 1) != FR_OK) {
-                            break;
-                        }
+            case CARD_DISCONNECTED:
+                HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+                mounted = 0;
+                break;
 
-                        if (f_open(&logfile, "journal.log", FA_OPEN_ALWAYS | FA_WRITE) != FR_OK) {
-                            break;
-                        }
-                        f_lseek(&logfile, f_size(&logfile));
-                        f_printf(&logfile, "%u SD Card mounted\n", HAL_GetTick());
-                        f_sync(&logfile); 
-                        HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
-                    }
-                    break;
-                case CARD_DISCONNECTED:
-                    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
-                    break;
+            case DATA_READY:
+                sd_write_data(event.data);
+                break;
 
-                default:
-                    break;
-            }
+            default:
+                break;
         }
     }
 }
 
+static void sd_mount()
+{
+    if (BSP_SD_Init() == MSD_OK) {
+        if (f_mount(&sdfs, SDPath, 1) != FR_OK) {
+            return;
+        }
+
+        if (f_open(&logfile, "journal.log", FA_OPEN_ALWAYS | FA_WRITE) != FR_OK) {
+            return;
+        }
+        f_lseek(&logfile, f_size(&logfile));
+
+        if (f_open(&datafile, "data.csv", FA_OPEN_ALWAYS | FA_WRITE) != FR_OK) {
+            return;
+        }
+        f_lseek(&datafile, f_size(&datafile));
+
+        f_printf(&logfile, "%u SD Card mounted\n", HAL_GetTick());
+        f_sync(&logfile);
+        HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+    }
+}
+
+static void sd_write_data(sd_data_t* data)
+{
+    if (!mounted) {
+        return;
+    }
+
+    sprintf(buffer, "%f\n", data->val);
+    sd_flush();
+
+    return;
+}
+
+static void sd_flush()
+{
+    int bw;
+    f_printf(&datafile, "%s", buffer);
+    f_sync(&datafile);
+    cursor = 0;
+    HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+}
+
 void app_sd_detect_handler()
 {
+    sd_event_t event = { .data = NULL };
+
     if (!HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin)) {
-        osMessagePut(sd_events, CARD_CONNECTED, osWaitForever);
+        event.type = CARD_CONNECTED;
+    } else {
+        event.type = CARD_DISCONNECTED;
     }
-    else {
-        osMessagePut(sd_events, CARD_DISCONNECTED, osWaitForever);
-    }
+    xQueueSendFromISR(sd_events, &event, osWaitForever);
 }

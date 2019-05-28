@@ -22,6 +22,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "can.h"
+#include "dma.h"
 #include "fatfs.h"
 #include "rtc.h"
 #include "sdio.h"
@@ -97,6 +98,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_RTC_Init();
   MX_SDIO_SD_Init();
   MX_USART1_UART_Init();
