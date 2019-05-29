@@ -36,11 +36,7 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-app/app_altitude.c \
-app/app_sd.c \
-app/app_heartbeat.c \
 ../shared/drivers/barometer/barometer.c \
-../shared/middleware/kalman/kalman.c \
 ../shared/middleware/arm_matrix/arm_mat_add_f32.c \
 ../shared/middleware/arm_matrix/arm_mat_cmplx_mult_f32.c \
 ../shared/middleware/arm_matrix/arm_mat_init_f32.c \
@@ -49,59 +45,64 @@ app/app_heartbeat.c \
 ../shared/middleware/arm_matrix/arm_mat_scale_f32.c \
 ../shared/middleware/arm_matrix/arm_mat_sub_f32.c \
 ../shared/middleware/arm_matrix/arm_mat_trans_f32.c \
-Src/main.c \
-Src/gpio.c \
-Src/syscalls.c \
-Src/bsp_driver_sd.c \
-Src/sd_diskio.c \
-Src/fatfs.c \
-Src/rtc.c \
-Src/sdio.c \
-Src/spi.c \
-Src/usart.c \
-Src/stm32f4xx_it.c \
-Src/stm32f4xx_hal_msp.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rtc.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rtc_ex.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sd.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c \
+../shared/middleware/kalman/kalman.c \
+../shared/app/app_heartbeat.c \
+../shared/app/app_sd.c \
+app/app_altitude.c \
+app/app_sd_data.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
-Src/system_stm32f4xx.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rtc_ex.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rtc.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sd.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c \
 Middlewares/Third_Party/FatFs/src/diskio.c \
-Middlewares/Third_Party/FatFs/src/ff.c \
 Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \
+Middlewares/Third_Party/FatFs/src/ff.c \
 Middlewares/Third_Party/FatFs/src/option/syscall.c \
-Src/can.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c \
-Src/freertos.c \
-Src/stm32f4xx_hal_timebase_tim.c \
+Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c \
 Middlewares/Third_Party/FreeRTOS/Source/croutine.c \
 Middlewares/Third_Party/FreeRTOS/Source/event_groups.c \
 Middlewares/Third_Party/FreeRTOS/Source/list.c \
+Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c \
+Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c \
 Middlewares/Third_Party/FreeRTOS/Source/queue.c \
 Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c \
 Middlewares/Third_Party/FreeRTOS/Source/tasks.c \
 Middlewares/Third_Party/FreeRTOS/Source/timers.c \
-Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c \
-Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c \
-Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c \
-Src/dma.c
+Src/bsp_driver_sd.c \
+Src/can.c \
+Src/dma.c \
+Src/fatfs.c \
+Src/freertos.c \
+Src/gpio.c \
+Src/main.c \
+Src/rtc.c \
+Src/sd_diskio.c \
+Src/sdio.c \
+Src/spi.c \
+Src/stm32f4xx_hal_msp.c \
+Src/stm32f4xx_hal_timebase_tim.c \
+Src/stm32f4xx_it.c \
+Src/syscalls.c \
+Src/system_stm32f4xx.c \
+Src/usart.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -158,15 +159,17 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
--I. \
+-Iapp \
 -IInc \
 -IDrivers/STM32F4xx_HAL_Driver/Inc \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -IMiddlewares/Third_Party/FatFs/src \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
+-I../shared/app \
 -I../shared/drivers \
 -I../shared/middleware \
+-I../shared/utils \
 -IMiddlewares/Third_Party/FreeRTOS/Source/include \
 -IMiddlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS \
 -IMiddlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F

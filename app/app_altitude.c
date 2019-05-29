@@ -17,19 +17,33 @@ void app_altitude_init()
 
 void app_altitude()
 {
+    sd_data_t* data;
+
     barometer_t barometer;
     barometer_init(&barometer, BARO_CS_GPIO_Port, BARO_CS_Pin, &hspi1);
 
     kalman_t kalman;
     kalman_init(&kalman);
-    sd_data_t data;
 
     while (1) {
         barometer_update(&barometer);
+        if ((data = app_sd_prepare_data()) != NULL) {
+            data->generic.type = SD_DATA_BARO;
+            data->baro.pressure = barometer.pressure;
+            data->baro.temperature = barometer.temperature;
+            app_sd_write_data(data);
+        }
+
         kalman_update(&kalman, pressure_to_altitude(barometer.pressure), 0, 0.020);
+        if ((data = app_sd_prepare_data()) != NULL) {
+            data->generic.type = SD_DATA_KALMAN;
+            data->kalman.altitude = kalman.altitude;
+            data->kalman.velocity = kalman.velocity;
+            data->kalman.acceleration = kalman.acceleration;
+            app_sd_write_data(data);
+        }
+
         osDelay(20);
-        data.val = kalman.altitude;
-        app_sd_write_data(&data);
-        HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
+        HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
     }
 }

@@ -32,9 +32,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "app/app_altitude.h"
-#include "app/app_heartbeat.h"
-#include "app/app_sd.h"
+#include "app_altitude.h"
+#include "app_heartbeat.h"
+#include "app_sd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
