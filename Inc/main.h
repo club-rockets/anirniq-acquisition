@@ -67,6 +67,8 @@ void Error_Handler(void);
 #define MTI_DRDY_GPIO_Port GPIOC
 #define MTI_SYNC_IN_Pin GPIO_PIN_5
 #define MTI_SYNC_IN_GPIO_Port GPIOC
+#define GPS_CONTROL_Pin GPIO_PIN_0
+#define GPS_CONTROL_GPIO_Port GPIOB
 #define MTI_RESET_Pin GPIO_PIN_8
 #define MTI_RESET_GPIO_Port GPIOE
 #define LED1_Pin GPIO_PIN_12
