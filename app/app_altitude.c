@@ -34,7 +34,7 @@ void app_altitude()
             app_sd_write_data(data);
         }
 
-        kalman_update(&kalman, pressure_to_altitude(barometer.pressure), 0, 0.020);
+        kalman_update(&kalman, pressure_to_altitude(barometer.pressure), 0, 0.020f);
         if ((data = app_sd_prepare_data()) != NULL) {
             data->generic.type = SD_DATA_KALMAN;
             data->kalman.altitude = kalman.altitude;

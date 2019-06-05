@@ -32,6 +32,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app_altitude.h"
+#include "app_gps.h"
 #include "app_heartbeat.h"
 #include "app_sd.h"
 /* USER CODE END Includes */
@@ -105,6 +106,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   app_altitude_init();
+  app_gps_init();
   app_heartbeat_init();
   app_sd_init();
   /* USER CODE END 2 */
@@ -185,6 +187,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       app_sd_detect_handler();
     }
 }
+
 /* USER CODE END 4 */
 
 /**
