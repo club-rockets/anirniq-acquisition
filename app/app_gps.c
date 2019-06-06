@@ -15,7 +15,7 @@ static QueueHandle_t gps_events;
 static MessageBufferHandle_t gps_messages;
 
 static void app_gps();
-osThreadDef(gps, app_gps, osPriorityNormal, 1, 1024);
+osThreadDef(gps, app_gps, osPriorityAboveNormal, 1, 1024);
 
 
 enum PARSER_STATE {
@@ -59,13 +59,13 @@ void app_gps()
                 if (message[2] == UBX_CLASS_NAV && message[3] == UBX_ID_POSLLH) {
                     struct UBX_POSLLH_payload* data = (struct UBX_POSLLH_payload*) &message[6];
 
-                    if ((sd_data = app_sd_prepare_data()) != NULL) {
+                    if ((sd_data = app_sd_prepare_data(SD_DATA_GPS)) != NULL) {
                         sd_data->gps.longitude = data->lon / 1e-7f;
                         sd_data->gps.latitude = data->lat / 1e-7f;
                         sd_data->gps.height = data->height / 1000.0f;
                         app_sd_write_data(sd_data);
-                        HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
                     }
+                    HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
                 }
                 break;
             default:

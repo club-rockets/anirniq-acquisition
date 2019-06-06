@@ -27,16 +27,14 @@ void app_altitude()
 
     while (1) {
         barometer_update(&barometer);
-        if ((data = app_sd_prepare_data()) != NULL) {
-            data->generic.type = SD_DATA_BARO;
+        if ((data = app_sd_prepare_data(SD_DATA_BARO)) != NULL) {
             data->baro.pressure = barometer.pressure;
             data->baro.temperature = barometer.temperature;
             app_sd_write_data(data);
         }
 
         kalman_update(&kalman, pressure_to_altitude(barometer.pressure), 0, 0.020f);
-        if ((data = app_sd_prepare_data()) != NULL) {
-            data->generic.type = SD_DATA_KALMAN;
+        if ((data = app_sd_prepare_data(SD_DATA_KALMAN)) != NULL) {
             data->kalman.altitude = kalman.altitude;
             data->kalman.velocity = kalman.velocity;
             data->kalman.acceleration = kalman.acceleration;
