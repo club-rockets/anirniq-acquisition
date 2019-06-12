@@ -8,6 +8,9 @@
 #include "main.h"
 
 #include "app_sd.h"
+#include "bsp_can.h"
+#include "can/can_driver.h"
+#include "id.h"
 
 extern UART_HandleTypeDef huart2;
 
@@ -47,6 +50,7 @@ void app_gps()
 {
     int event;
     sd_data_t* sd_data;
+    can_regData_u can_data;
     
     __HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
 
@@ -65,9 +69,36 @@ void app_gps()
                         sd_data->gps.height = data->height / 1000.0f;
                         app_sd_write_data(sd_data);
                     }
-                    HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+
+                    can_data.FLOAT = data->lon;
+                    can_canSetRegisterData(CAN_ACQUISITION_GPS_LON_INDEX, &can_data);
+                    can_data.FLOAT = data->lat;
+                    can_canSetRegisterData(CAN_ACQUISITION_GPS_LAT_INDEX, &can_data);
+                }
+                else if (message[2] == UBX_CLASS_NAV && message[3] == UBX_ID_TIMEUTC) {
+                    struct UBX_TIMEUTC_payload* data = (struct UBX_TIMEUTC_payload*) &message[6];
+
+                    if ((sd_data = app_sd_prepare_data(SD_DATA_GPS_TIME)) != NULL) {
+                        sd_data->gps_time.year = data->year;
+                        sd_data->gps_time.month = data->month;
+                        sd_data->gps_time.day = data->day;
+                        sd_data->gps_time.hour = data->hour;
+                        sd_data->gps_time.minute = data->min;
+                        sd_data->gps_time.second = data->sec;
+                        app_sd_write_data(sd_data);
+                    }
+                }
+                else if (message[2] == UBX_CLASS_NAV && message[3] == UBX_ID_STATUS) {
+                    struct UBX_STATUS_payload* data = (struct UBX_STATUS_payload*) &message[6];
+                    if (data->gpsFix == FIX_2D || data->gpsFix == FIX_3D) {
+                        HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+                    }
+                    else {
+                        HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+                    }
                 }
                 break;
+
             default:
                 /* Unhandled event */
                 break;

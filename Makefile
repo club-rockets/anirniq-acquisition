@@ -36,6 +36,9 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
+../shared/bsp/bsp_can_regdef.c \
+../shared/bsp/bsp_can.c \
+../shared/drivers/can/can_driver.c \
 ../shared/drivers/barometer/barometer.c \
 ../shared/middleware/arm_matrix/arm_mat_add_f32.c \
 ../shared/middleware/arm_matrix/arm_mat_cmplx_mult_f32.c \
@@ -166,7 +169,9 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
 -I../shared/app \
+-I../shared/bsp \
 -I../shared/drivers \
+-I../shared/interfaces \
 -I../shared/middleware \
 -I../shared/utils \
 -IMiddlewares/Third_Party/FreeRTOS/Source/include \

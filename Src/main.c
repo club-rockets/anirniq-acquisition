@@ -35,6 +35,8 @@
 #include "app_gps.h"
 #include "app_heartbeat.h"
 #include "app_sd.h"
+
+#include "bsp_can.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,14 +57,14 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+extern canInstance_t can1Instance;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
-
+uint32_t can_init();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -104,6 +106,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
+  can_init();
   /* USER CODE BEGIN 2 */
   app_altitude_init();
   app_gps_init();
@@ -188,6 +191,39 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     }
 }
 
+uint32_t can_init()
+{
+    can1Instance.instance = CAN1;
+    can1Instance.debugFreeze = 0;
+    can1Instance.opMode = normal;
+    can1Instance.baudPrescaler = 3;
+    can1Instance.timeQuanta1 = 14;
+    can1Instance.timeQuanta2 = 11;
+    can1Instance.timeReSync = 2;
+
+    canInit(&can1Instance);
+    //init interruption for fan 1 fifo 0
+    can1Fifo0InitIt(&can1Instance);
+    can1Fifo0RegisterCallback(can_regUpdateCallback);
+
+    //init filters for boards
+    canFilter_t filter = {0};
+
+    filter.mask11.mask0 = BOARD_ID_MASK;
+    filter.mask11.ID0 = BOARD_EMERGENCY_ID_SHIFTED;
+    filter.mask11.mask1 = BOARD_ID_MASK;
+    filter.mask11.ID1 = BOARD_MISSION_ID_SHIFTED;
+    canSetFilter(&can1Instance, &filter,mask11Bit, 0, 0);
+
+    filter.mask11.mask0 = BOARD_ID_MASK;
+    filter.mask11.ID0 = BOARD_COMMUNICATION_ID_SHIFTED;
+    filter.mask11.mask1 = BOARD_ID_MASK;
+    filter.mask11.ID1 = BOARD_COMMUNICATION_ID_SHIFTED;
+    canSetFilter(&can1Instance, &filter,mask11Bit, 1, 0);
+
+    NVIC_SetPriority(20, 10);
+    return 0;
+}
 /* USER CODE END 4 */
 
 /**
