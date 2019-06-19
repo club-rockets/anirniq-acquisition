@@ -64,15 +64,15 @@ void app_gps()
                     struct UBX_POSLLH_payload* data = (struct UBX_POSLLH_payload*) &message[6];
 
                     if ((sd_data = app_sd_prepare_data(SD_DATA_GPS)) != NULL) {
-                        sd_data->gps.longitude = data->lon / 1e-7f;
-                        sd_data->gps.latitude = data->lat / 1e-7f;
+                        sd_data->gps.longitude = data->lon / 1e7f;
+                        sd_data->gps.latitude = data->lat / 1e7f;
                         sd_data->gps.height = data->height / 1000.0f;
                         app_sd_write_data(sd_data);
                     }
 
-                    can_data.FLOAT = data->lon;
+                    can_data.FLOAT = data->lon / 1e7f;
                     can_canSetRegisterData(CAN_ACQUISITION_GPS_LON_INDEX, &can_data);
-                    can_data.FLOAT = data->lat;
+                    can_data.FLOAT = data->lat / 1e7f;
                     can_canSetRegisterData(CAN_ACQUISITION_GPS_LAT_INDEX, &can_data);
                 }
                 else if (message[2] == UBX_CLASS_NAV && message[3] == UBX_ID_TIMEUTC) {

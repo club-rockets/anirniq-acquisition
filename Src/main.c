@@ -112,6 +112,7 @@ int main(void)
   app_gps_init();
   app_heartbeat_init();
   app_sd_init();
+  HAL_GPIO_WritePin(CAN1_STANDBY_GPIO_Port, CAN1_STANDBY_Pin, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
