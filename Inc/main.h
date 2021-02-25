@@ -33,7 +33,9 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "enums.h"
+#include "freeRTOS.h"
+#include "task.h"
+#include "portable.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

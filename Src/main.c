@@ -20,9 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
 #include "dma.h"
-#include "fatfs.h"
 #include "rtc.h"
 #include "sdio.h"
 #include "spi.h"
@@ -31,12 +29,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "app_altitude.h"
-#include "app_gps.h"
-#include "app_heartbeat.h"
-#include "app_sd.h"
-
-#include "bsp_can.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,13 +54,20 @@ extern canInstance_t can1Instance;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 uint32_t can_init();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+/* TASK BLINK*/
+#define APP_BLINK_NAME "BLINK"
+#define APP_BLINK_PRIORITY 1
+#define APP_BLINK_SIZE 192
+StaticTask_t APP_BLINK_BUFFER;
+StackType_t APP_BLINK_STACK[ APP_BLINK_SIZE ];
+
 /* USER CODE END 0 */
 
 /**
@@ -80,7 +79,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -106,22 +104,27 @@ int main(void)
   MX_USART1_UART_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
-  can_init();
   /* USER CODE BEGIN 2 */
-  app_altitude_init();
-  app_gps_init();
-  app_heartbeat_init();
-  app_sd_init();
   HAL_GPIO_WritePin(CAN1_STANDBY_GPIO_Port, CAN1_STANDBY_Pin, GPIO_PIN_RESET);
+
+  /* FREERTOS TASK CREATION */
+
+  TaskHandle_t xHandle = NULL;
+
+  /* Create the task without using any dynamic memory allocation. */
+  xHandle = xTaskCreateStatic(
+           task_blink,       /* Function that implements the task. */
+           APP_BLINK_NAME,          /* Text name for the task. */
+		   APP_BLINK_SIZE,      /* Number of indexes in the xStack array. */
+           ( void * ) 1,    /* Parameter passed into the task. */
+           APP_BLINK_PRIORITY,/* Priority at which the task is created. */
+		   APP_BLINK_STACK,          /* Array to use as the task's stack. */
+           &APP_BLINK_BUFFER );  /* Variable to hold the task's data structure. */
+
+	/* Start the scheduler. */
+	vTaskStartScheduler();
+
   /* USER CODE END 2 */
-
-  /* Call init function for freertos objects (in freertos.c) */
-  MX_FREERTOS_Init();
-
-  /* Start scheduler */
-  osKernelStart();
-  
-  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -144,11 +147,11 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
-  /** Configure the main internal regulator output voltage 
+  /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE|RCC_OSCILLATORTYPE_LSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
@@ -163,7 +166,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -269,7 +272,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
