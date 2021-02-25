@@ -59,12 +59,9 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c \
 Src/bsp_driver_sd.c \
 Src/dma.c \
-Src/fatfs.c \
-Src/freertos.c \
 Src/gpio.c \
 Src/main.c \
 Src/rtc.c \
-Src/sd_diskio.c \
 Src/sdio.c \
 Src/spi.c \
 Src/stm32f4xx_hal_msp.c \
@@ -73,15 +70,16 @@ Src/stm32f4xx_it.c \
 Src/syscalls.c \
 Src/system_stm32f4xx.c \
 Src/usart.c \
-Src/blink.c \
-Middleware/croutine.c \
-Middleware/event_groups.c \
-Middleware/list.c \
-Middleware/queue.c \
-Middleware/stream_buffer.c \
-Middleware/tasks.c \
-Middleware/timers.c \
-Middleware/portable/GCC/ARM_CM4F/port.c
+Src/freertos.c \
+app/blink.c \
+Middlewares/FreeRTOS/croutine.c \
+Middlewares/FreeRTOS/event_groups.c \
+Middlewares/FreeRTOS/list.c \
+Middlewares/FreeRTOS/queue.c \
+Middlewares/FreeRTOS/stream_buffer.c \
+Middlewares/FreeRTOS/tasks.c \
+Middlewares/FreeRTOS/timers.c \
+Middlewares/FreeRTOS/portable/GCC/ARM_CM4F/port.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -138,15 +136,14 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
--Iapp \
 -IInc \
+-Iapp \
 -IDrivers/STM32F4xx_HAL_Driver/Inc \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
--IMiddlewares/Third_Party/FatFs/src \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
--IMiddlewares/FreeRTOS/Source/include \
--IMiddlewares/FreeRTOS/Source/portable/GCC/ARM_CM4F
+-IMiddlewares/FreeRTOS/include \
+-IMiddlewares/FreeRTOS/portable/GCC/ARM_CM4F
 
 
 # compile gcc flags

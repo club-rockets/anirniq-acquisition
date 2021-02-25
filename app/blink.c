@@ -1,10 +1,8 @@
-#include "main.h"
-
-void task_blink(void * pvParameters);
+#include "blink.h"
 
 void task_blink(void * pvParameters){
 
-	configASSERT( ( uint32_t ) pvParameters == 1UL );
+	configASSERT( ( uint32_t ) pvParameters == 0UL );
 
     for( ;; )
     {

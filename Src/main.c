@@ -29,6 +29,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+#include "blink.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,13 +52,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-extern canInstance_t can1Instance;
+//extern canInstance_t can1Instance;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-uint32_t can_init();
+//uint32_t can_init();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -116,7 +119,7 @@ int main(void)
            task_blink,       /* Function that implements the task. */
            APP_BLINK_NAME,          /* Text name for the task. */
 		   APP_BLINK_SIZE,      /* Number of indexes in the xStack array. */
-           ( void * ) 1,    /* Parameter passed into the task. */
+           ( void * ) NULL,    /* Parameter passed into the task. */
            APP_BLINK_PRIORITY,/* Priority at which the task is created. */
 		   APP_BLINK_STACK,          /* Array to use as the task's stack. */
            &APP_BLINK_BUFFER );  /* Variable to hold the task's data structure. */
@@ -191,11 +194,11 @@ void SystemClock_Config(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == SD_DETECT_Pin) {
-      app_sd_detect_handler();
+   //   app_sd_detect_handler();
     }
 }
 
-uint32_t can_init()
+/*uint32_t can_init()
 {
     can1Instance.instance = CAN1;
     can1Instance.debugFreeze = 0;
@@ -227,7 +230,7 @@ uint32_t can_init()
 
     NVIC_SetPriority(20, 10);
     return 0;
-}
+}*/
 /* USER CODE END 4 */
 
 /**

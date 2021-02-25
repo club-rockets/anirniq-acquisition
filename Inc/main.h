@@ -33,9 +33,12 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "freeRTOS.h"
+#include "FreeRTOS.h"
 #include "task.h"
-#include "portable.h"
+#include "queue.h"
+#include "semphr.h"
+#include "event_groups.h"
+#include "timers.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
