@@ -32,6 +32,7 @@
 /* USER CODE BEGIN Includes */
 
 #include "blink.h"
+#include "sd.h"
 
 /* USER CODE END Includes */
 
