@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dma.h"
+#include "fatfs.h"
 #include "rtc.h"
 #include "sdio.h"
 #include "spi.h"
@@ -71,6 +72,13 @@ void SystemClock_Config(void);
 StaticTask_t APP_BLINK_BUFFER;
 StackType_t APP_BLINK_STACK[ APP_BLINK_SIZE ];
 
+/* TASK SD*/
+#define APP_SD_NAME "SD"
+#define APP_SD_PRIORITY 2
+#define APP_SD_SIZE 1000
+StaticTask_t APP_SD_BUFFER;
+StackType_t APP_SD_STACK[ APP_SD_SIZE ];
+
 /* USER CODE END 0 */
 
 /**
@@ -107,6 +115,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(CAN1_STANDBY_GPIO_Port, CAN1_STANDBY_Pin, GPIO_PIN_RESET);
 
@@ -123,6 +132,15 @@ int main(void)
            APP_BLINK_PRIORITY,/* Priority at which the task is created. */
 		   APP_BLINK_STACK,          /* Array to use as the task's stack. */
            &APP_BLINK_BUFFER );  /* Variable to hold the task's data structure. */
+
+  xHandle = xTaskCreateStatic(
+           task_sd,
+           APP_SD_NAME,
+		   APP_SD_SIZE,
+           ( void * ) NULL,
+           APP_SD_PRIORITY,
+		   APP_SD_STACK,
+           &APP_SD_BUFFER );
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -193,7 +211,7 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin == SD_DETECT_Pin) {
+    if (GPIO_Pin == sd_detect_Pin) {
    //   app_sd_detect_handler();
     }
 }
