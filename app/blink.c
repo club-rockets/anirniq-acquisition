@@ -10,7 +10,7 @@ void task_blink(void * pvParameters){
         vTaskDelay(BLINK_FREQUENCY); //1 second delay
         HAL_GPIO_TogglePin(LED4_GPIO_Port, LED4_Pin);
 
-       // sd_writeUint("test",1);
+        sd_writeUint("test",1);
     }
 
 }
