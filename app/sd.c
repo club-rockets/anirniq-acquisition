@@ -24,6 +24,7 @@ extern uint8_t retSD;    /* Return value for SD */
 extern char SDPath[4];   /* SD logical drive path */
 extern FATFS SDFatFS;    /* File system object for SD logical drive */
 extern FIL SDFile;       /* File object for SD */
+static BYTE work[_MAX_SS]; /* Work area (larger is better for processing time) */
 #endif
 
 QueueHandle_t sd_queue;
@@ -50,9 +51,10 @@ void task_sd(void * pvParameters){
 
 	FRESULT fatStatus = f_mount(&SDFatFS,SDPath,1);
 
-	while( fatStatus != FR_OK){
-		//the card is not present, suspend the task
+	if( fatStatus != FR_OK){
+
 		vTaskSuspend(0);
+
 	}
 
 	//create a new directory to avoid overwriting old data
