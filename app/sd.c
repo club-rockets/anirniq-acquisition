@@ -92,10 +92,7 @@ void task_sd(void * pvParameters){
 				b = (int32_t)(a*1000.0);
 				sizeCounter += f_printf(&SDFile,".%ld\n",b);
 			}
-
 		}
-
-
 
 		//flush every 10sec
 		if(xTaskGetTickCount() - syncTimer >= 10000){
