@@ -33,6 +33,8 @@
 #ifndef XBUSTOSTRING_H
 #define XBUSTOSTRING_H
 
+#include <stdint.h>
+
 const char* xbusToString(const uint8_t* xbusData);
 
 

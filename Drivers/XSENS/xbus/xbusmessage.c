@@ -33,6 +33,14 @@
 #include "xbusmessage.h"
 #include "xbusdef.h"
 
+void XbusMessageCreate(XbusMessage* msg, uint8_t mid){
+
+	msg->m_mid = mid;
+	msg->m_length = 0;
+	msg->m_data = NULL;
+
+}
+
 /*!	\brief Format a message into the raw mtssp format ready for transmission to a motion tracker.
 */
 size_t XbusMessage_createRawMessage(uint8_t* dest, XbusMessage* message, XbusBusFormat format)

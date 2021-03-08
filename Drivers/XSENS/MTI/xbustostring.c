@@ -41,7 +41,7 @@ static char g_textBuffer[256];
 
 /*!	\brief Helper function for reading a uint8_t
 */
-uint8_t readUint8(const uint8_t* data, int* index)
+uint8_t readUint8(const uint8_t* data, int index)
 {
 	uint8_t result = data[index++];
 	return result;
@@ -50,7 +50,7 @@ uint8_t readUint8(const uint8_t* data, int* index)
 
 /*!	\brief Helper function for reading a uint16_t
 */
-uint16_t readUint16(const uint8_t* data, int* index)
+uint16_t readUint16(const uint8_t* data, int index)
 {
 	uint16_t result = 0;
 	result |= data[index++] << 8;
@@ -61,7 +61,7 @@ uint16_t readUint16(const uint8_t* data, int* index)
 
 /*!	\brief Helper function for reading a uint32_t
 */
-uint32_t readUint32(const uint8_t* data, int* index)
+uint32_t readUint32(const uint8_t* data, int index)
 {
 	uint32_t result = 0;
 	result |= data[index++] << 24;
@@ -74,7 +74,7 @@ uint32_t readUint32(const uint8_t* data, int* index)
 
 /*!	\brief Helper function for reading a float
 */
-float readFloat(const uint8_t* data, int* index)
+float readFloat(const uint8_t* data, int index)
 {
 	uint32_t temp = readUint32(data, index);
 	float result;
@@ -107,7 +107,7 @@ const char* xbusToString(const uint8_t* xbusData)
 		case XMID_DeviceId:
 		{
 			uint32_t deviceId = readUint32(xbusData, index);
-			snprintf(g_textBuffer, sizeof(g_textBuffer), "XMID_DeviceId: %08X", deviceId);
+			snprintf(g_textBuffer, sizeof(g_textBuffer), "XMID_DeviceId: %08X", (unsigned int)deviceId);
 			return g_textBuffer;
 		} break;
 
