@@ -73,6 +73,7 @@ Src/usart.c \
 Src/freertos.c \
 app/blink.c \
 app/sd.c \
+app/mti.c \
 Middlewares/FreeRTOS/croutine.c \
 Middlewares/FreeRTOS/event_groups.c \
 Middlewares/FreeRTOS/list.c \
