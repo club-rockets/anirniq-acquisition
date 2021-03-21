@@ -34,6 +34,7 @@
 #define XBUS_HELPERS_H
 
 #include "main.h"
+#include "xbusdef.h"
 
 	bool checkPreamble(const uint8_t* xbusMessage);
 
