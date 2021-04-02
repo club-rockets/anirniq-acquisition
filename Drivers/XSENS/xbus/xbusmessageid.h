@@ -58,7 +58,9 @@ enum XsMessageId
 	XMID_GotoBootLoader      = 0xF0,
 	XMID_GotoBootLoaderAck   = 0xF1,
 	XMID_ReqFirmwareRevision = 0x12,
-	XMID_FirmwareRevision    = 0x13
+	XMID_FirmwareRevision    = 0x13,
+	XMID_ReqConfiguration	 = 0x0C,
+	XMID_ReqConfigurationAck = 0x0D
 
 };
 

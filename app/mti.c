@@ -111,14 +111,17 @@ void config_mti(void){
 
 	/* FETCH MTI CONFIGURATION */
 
-	mti_send(0x0C);
-	mti_receive(0x0D); //Expected 118 bytes
+	mti_send(XMID_ReqConfiguration);
+	mti_receive(XMID_ReqConfigurationAck); //Expected 118 bytes
 
 	memcpy(&mtiConfig, getPointerToPayload(xbusMessage), getPayloadLength(xbusMessage)); //Copy configuration of xbusMessage
 
 }
 
 void task_mti(void * pvParameters){
+
+
+	//Different task for the rocket status
 
 	for(;;){
 
