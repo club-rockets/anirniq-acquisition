@@ -42,9 +42,9 @@ static void mti_send(uint8_t msgId){
 */
 void resetDevice(void)
 {
-	HAL_GPIO_WritePin(RESET_PORT, RESET_PIN, GPIO_PIN_SET);
-	wait_us(5000);
 	HAL_GPIO_WritePin(RESET_PORT, RESET_PIN, GPIO_PIN_RESET);
+	wait_us(5000);
+	HAL_GPIO_WritePin(RESET_PORT, RESET_PIN, GPIO_PIN_SET);
 }
 
 void config_mti(void){
@@ -57,6 +57,8 @@ void config_mti(void){
 
 	//Wait for data ready
 	mti_waitForBoot();
+
+	/* RECEIVE DEVICE ACKNOWLEDGE */
 
 	MtsspInterface_readPipeStatus(&notificationMessageSize, &measurementMessageSize); //Read pipe status
 	wait_us(5); //Wait for next transfert
@@ -79,6 +81,8 @@ void config_mti(void){
 
 		}
 	}
+
+	/* GO TO CONFIG STATE */
 
 	//Check if in config state
 	mti_send(XMID_GotoConfig);
@@ -112,12 +116,17 @@ void config_mti(void){
 				mti_error();
 			}
 
+	/* SEND THE SETUP CONFIGURATION */
+
+
+
 
 }
 
 void task_mti(void * pvParameters){
 
 	for(;;){
+
 
 
 
