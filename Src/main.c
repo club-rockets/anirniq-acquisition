@@ -31,8 +31,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "blink.h"
-#include "sd.h"
+#include "../../shared/app/blink.h"
+#include "../../shared/app/sd.h"
+#include "mti.h"
 
 /* USER CODE END Includes */
 
@@ -68,17 +69,24 @@ void SystemClock_Config(void);
 
 /* TASK BLINK*/
 #define APP_BLINK_NAME "BLINK"
-#define APP_BLINK_PRIORITY 1
+#define APP_BLINK_PRIORITY 0
 #define APP_BLINK_SIZE 192
 StaticTask_t APP_BLINK_BUFFER;
 StackType_t APP_BLINK_STACK[ APP_BLINK_SIZE ];
 
 /* TASK SD*/
 #define APP_SD_NAME "SD"
-#define APP_SD_PRIORITY 2
+#define APP_SD_PRIORITY 0
 #define APP_SD_SIZE 1000
 StaticTask_t APP_SD_BUFFER;
 StackType_t APP_SD_STACK[ APP_SD_SIZE ];
+
+/* TASK MTI*/
+#define APP_MTI_NAME "MTI"
+#define APP_MTI_PRIORITY 0
+#define APP_MTI_SIZE 192
+StaticTask_t APP_MTI_BUFFER;
+StackType_t APP_MTI_STACK[ APP_MTI_SIZE ];
 
 /* USER CODE END 0 */
 
@@ -120,6 +128,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(CAN1_STANDBY_GPIO_Port, CAN1_STANDBY_Pin, GPIO_PIN_RESET);
 
+  config_mti();
+
   /* FREERTOS TASK CREATION */
 
   TaskHandle_t xHandle = NULL;
@@ -142,6 +152,15 @@ int main(void)
            APP_SD_PRIORITY,
 		   APP_SD_STACK,
            &APP_SD_BUFFER );
+
+  xHandle = xTaskCreateStatic(
+           task_mti,
+           APP_MTI_NAME,
+		   APP_MTI_SIZE,
+           ( void * ) NULL,
+           APP_MTI_PRIORITY,
+		   APP_MTI_STACK,
+           &APP_MTI_BUFFER );
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();

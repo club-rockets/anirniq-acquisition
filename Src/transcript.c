@@ -1,4 +1,5 @@
 #include "transcript.h"
+#include <string.h>
 
 void transcript(const char* module, const char* pData, uint8_t code){
 

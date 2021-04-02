@@ -56,22 +56,7 @@ typedef struct t_config{
 	uint8_t outputMode[2];
 	uint8_t outputSettings[4];
 
-}config;
-
-//Transcript enable define
-#define configTRANSCRIPT_ENABLED 	1
-
-//Transcript message
-#define configTRANSCRIPT_WARNING 	1
-#define configTRANSCRIPT_ERROR 		1
-#define configTRANSCRIPT_DEFAULT 	1
-
-enum{
-
-	CWARNING = 1,
-	CERROR
-
-};
+}mti_config_reg;
 
 typedef enum t_mti_state{
 
@@ -81,7 +66,7 @@ typedef enum t_mti_state{
 
 }mti_state;
 
-static uint8_t xbusMessage[2056];
+
 
 void transcript(const char* module, const char* pData, uint8_t code);
 void mti_readPipe();
@@ -163,11 +148,7 @@ void mti_readPipe(){
 	}
 }
 
-void mti_error(){
 
-	transcript("mti", "Something went wrong - Suspend task", CERROR);
-	while(1); //Stop the task
-}
 
 /*!	\brief Defines the main loop of the program which handles user commands
 */

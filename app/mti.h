@@ -3,6 +3,8 @@
 
 #include "stdint.h"
 
+void resetDevice(void);
+void config_mti(void);
 void task_mti(void * pvParameters);
 
 #endif

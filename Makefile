@@ -57,6 +57,12 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c \
+Drivers/XSENS/wait.c \
+Drivers/XSENS/MTI/xbustostring.c \
+Drivers/XSENS/mtinterface/mtssp_driver_spi.c \
+Drivers/XSENS/mtinterface/mtssp_interface.c \
+Drivers/XSENS/xbus/xbushelpers.c \
+Drivers/XSENS/xbus/xbusmessage.c \
 Src/bsp_driver_sd.c \
 Src/dma.c \
 Src/gpio.c \
@@ -71,8 +77,9 @@ Src/syscalls.c \
 Src/system_stm32f4xx.c \
 Src/usart.c \
 Src/freertos.c \
-app/blink.c \
-app/sd.c \
+Src/transcript.c \
+../shared/app/blink.c \
+../shared/app/sd.c \
 app/mti.c \
 Middlewares/FreeRTOS/croutine.c \
 Middlewares/FreeRTOS/event_groups.c \
@@ -151,9 +158,14 @@ C_INCLUDES =  \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
+-IDrivers/XSENS \
+-IDrivers/XSENS/MTI \
+-IDrivers/XSENS/mtinterface \
+-IDrivers/XSENS/xbus \
 -IMiddlewares/FreeRTOS/include \
 -IMiddlewares/FreeRTOS/portable/GCC/ARM_CM4F \
--IMiddlewares/Third_Party/FatFs/src
+-IMiddlewares/Third_Party/FatFs/src \
+-I..shared/app
 
 
 # compile gcc flags

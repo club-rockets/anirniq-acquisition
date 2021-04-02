@@ -34,7 +34,7 @@
 
 	/*!	\brief Returns true if the preamble equeals 0xFA, false othersise
 	*/
-	bool checkPreamble(const uint8_t* xbusMessage)
+	uint8_t checkPreamble(const uint8_t* xbusMessage)
 	{
 		return xbusMessage[OFFSET_TO_PREAMBLE] == XBUS_PREAMBLE;
 	}
@@ -154,7 +154,7 @@
 
 	/*! \brief Verifies the checksum of aon xbus message
 	*/
-	bool verifyChecksum(const uint8_t* xbusMessage)
+	uint8_t verifyChecksum(const uint8_t* xbusMessage)
 	{
 		int nBytes =  getRawLength(xbusMessage);
 		uint8_t checksum = 0;
