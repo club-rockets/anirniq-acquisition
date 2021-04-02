@@ -95,22 +95,25 @@
 #define CONFIG_SIZE_OUTPUT_MODE				2
 #define CONFIG_SIZE_OUTPUT_SETTINGS			4
 
-typedef struct t_config{
+typedef struct __attribute__ ((__packed__)){
 
-	uint8_t deviceID[4];
-	uint8_t samplingP[2];
-	uint8_t OutputSkipfactor[2];
-	uint8_t SsettingsMode[2];
-	uint8_t SsettingsOffset[4];
+	uint8_t masterDeviceID[4];
+	uint8_t samplingPeriod[2];
+	uint8_t outputSkipfactor[2];
+	uint8_t syncinSettingsMode[2];
+	uint8_t syncinSkipFactor[2];
+	uint8_t syncinSettingsOffset[4];
 	uint8_t YYYYMMDD[8];
 	uint8_t HHMMSSHH[8];
+	uint8_t reserved1[64];
 	uint8_t numberDevice[2];
-	uint8_t DeviceID[4];
-	uint8_t MTData2Datalength[2];
+	uint8_t deviceID[4];
+	uint8_t mtData2Datalength[2];
 	uint8_t outputMode[2];
 	uint8_t outputSettings[4];
+	uint8_t reserved2[8];
 
-}config;
+}mtiConfiguration;
 
 /* MTDATA2 */
 
