@@ -33,7 +33,7 @@
 #ifndef XSDATAIDENTIFIERVALUE_H
 #define XSDATAIDENTIFIERVALUE_H
 
-#include "pstdint.h"
+//#include "pstdint.h"
 #define XDI_MAX_FREQUENCY_VAL	0xFFFF
 #define XDI_MAX_FREQUENCY		((uint16_t) XDI_MAX_FREQUENCY_VAL)
 

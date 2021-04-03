@@ -36,6 +36,7 @@
 #include "mti.h"
 
 SemaphoreHandle_t xSemaphoreDRDY = NULL;
+StaticSemaphore_t xSemaphoreDRDYBuffer;
 
 /* USER CODE END Includes */
 
@@ -133,6 +134,10 @@ int main(void)
   config_mti();
 
   /* FREERTOS TASK CREATION */
+
+	//Create binary semaphore for DRDY interrupt request
+	xSemaphoreDRDY = xSemaphoreCreateBinaryStatic( &xSemaphoreDRDYBuffer );
+	configASSERT( xSemaphoreDRDY );
 
   TaskHandle_t xHandle = NULL;
 

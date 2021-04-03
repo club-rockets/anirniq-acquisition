@@ -35,7 +35,10 @@
 
 #include <stdint.h>
 
-const char* xbusToString(const uint8_t* xbusData);
+uint8_t readUint8(const uint8_t* data, uint8_t* index);
+uint16_t readUint16(const uint8_t* data, uint8_t* index);
+uint32_t readUint32(const uint8_t* data, uint8_t* index);
+float readFloat(const uint8_t* data, uint8_t* index);
 
 
 #endif

@@ -36,114 +36,46 @@
 #include <string.h>
 #include "xbushelpers.h"
 
-static char g_textBuffer[256];
-
 
 /*!	\brief Helper function for reading a uint8_t
 */
-uint8_t readUint8(const uint8_t* data, int index)
+uint8_t readUint8(const uint8_t* data, uint8_t* index)
 {
-	uint8_t result = data[index++];
+	uint8_t result = data[(*index)++];
 	return result;
 }
 
 
 /*!	\brief Helper function for reading a uint16_t
 */
-uint16_t readUint16(const uint8_t* data, int index)
+uint16_t readUint16(const uint8_t* data, uint8_t* index)
 {
 	uint16_t result = 0;
-	result |= data[index++] << 8;
-	result |= data[index++] << 0;
+	result |= data[(*index)++] << 8;
+	result |= data[(*index)++] << 0;
 	return result;
 }
 
 
 /*!	\brief Helper function for reading a uint32_t
 */
-uint32_t readUint32(const uint8_t* data, int index)
+uint32_t readUint32(const uint8_t* data, uint8_t* index)
 {
 	uint32_t result = 0;
-	result |= data[index++] << 24;
-	result |= data[index++] << 16;
-	result |= data[index++] << 8;
-	result |= data[index++] << 0;
+	result |= data[(*index)++] << 24;
+	result |= data[(*index)++] << 16;
+	result |= data[(*index)++] << 8;
+	result |= data[(*index)++] << 0;
 	return result;
 }
 
 
 /*!	\brief Helper function for reading a float
 */
-float readFloat(const uint8_t* data, int index)
+float readFloat(const uint8_t* data, uint8_t* index)
 {
 	uint32_t temp = readUint32(data, index);
 	float result;
 	memcpy(&result, &temp, 4);
 	return result;
-}
-
-
-/*!	\brief Returns a string representation of an Xbus message
-	\param[in] xbusData pointer to the xbus message
-	\return String representation of the Xbus message
-	Note: Only the printing of a limited number of messages is currently implemented,
-	i.e. only the messages which are used in the example.
-*/
-const char* xbusToString(const uint8_t* xbusData)
-{
-	if (!checkPreamble(xbusData))
-		return "Invalid xbus message";
-
-	uint8_t messageId = getMessageId(xbusData);
-	int index = 4;
-
-	switch (messageId)
-	{
-		case XMID_Wakeup:
-		{
-			return "XMID_Wakeup";
-		} break;
-
-		case XMID_DeviceId:
-		{
-			uint32_t deviceId = readUint32(xbusData, index);
-			snprintf(g_textBuffer, sizeof(g_textBuffer), "XMID_DeviceId: %08X", (unsigned int)deviceId);
-			return g_textBuffer;
-		} break;
-
-		case XMID_GotoConfigAck:
-		{
-			return "XMID_GotoConfigAck";
-		} break;
-
-		case XMID_GotoMeasurementAck:
-		{
-			return "XMID_GotoMeasurementAck";
-		} break;
-
-		case XMID_MtData2:
-		{
-			uint16_t dataId = readUint16(xbusData, index);
-			uint8_t dataSize = readUint8(xbusData, index);
-			if (dataId == 0x2030 && dataSize == 12)
-			{
-				float roll = readFloat(xbusData, index);
-				float pitch = readFloat(xbusData, index);
-				float yaw = readFloat(xbusData, index);
-				snprintf(g_textBuffer, sizeof(g_textBuffer), "XMID_MtData2: roll = %.2f, pitch = %.2f, yaw = %.2f", roll , pitch, yaw);
-			}
-			else
-			{
-				snprintf(g_textBuffer, sizeof(g_textBuffer), "XMID_MtData2: Unexpected format");
-			}
-
-			return g_textBuffer;
-		} break;
-
-		default:
-		{
-			snprintf(g_textBuffer, sizeof(g_textBuffer), "Unhandled xbus message: MessageId = %02X", messageId);
-		}
-	}
-	return g_textBuffer;
 }
