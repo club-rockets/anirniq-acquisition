@@ -112,7 +112,7 @@ void config_mti(void){
 	/* FETCH MTI CONFIGURATION */
 
 	mti_send(XMID_ReqConfiguration);
-	mti_receive(XMID_ReqConfigurationAck); //Expected 118 bytes
+	mti_receive(XMID_Configuration); //Expected 118 bytes
 
 	memcpy(&mtiConfig, getPointerToPayload(xbusMessage), getPayloadLength(xbusMessage)); //Copy configuration of xbusMessage
 
