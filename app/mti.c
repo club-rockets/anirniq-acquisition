@@ -2,9 +2,11 @@
 
 #include <string.h>
 
+#define APP_MTI_NAME "MTI"
+
 static uint8_t xbusMessage[500];
 static mti_device_state mtiState = 0;
-static mtData2 mtiData;
+static volatile mtData2 mtiData;
 
 static void mti_error(){
 
@@ -42,7 +44,6 @@ void mti_receive(uint8_t msgId){
 
 	#if (configTRANSCRIPT_ENABLED)
 					transcript(APP_MTI_NAME,"Message received was not expected",CERROR);
-					transcript(APP_MTI_NAME,xbusToString(xbusMessage),CERROR);
 	#endif
 					mti_error();
 				}
@@ -154,6 +155,14 @@ uint8_t mti_mtData2_parse(XbusMessage msg){
 				mtiData.xdiAcceleration.x = readFloat(msg.m_data, &dataIndex);
 				mtiData.xdiAcceleration.y = readFloat(msg.m_data, &dataIndex);
 				mtiData.xdiAcceleration.z = readFloat(msg.m_data, &dataIndex);
+
+				break;
+
+			case XDI_Temperature:
+
+				if(dataSize != sizeof(mtiData.xdiTemperature)) break;
+
+				mtiData.xdiTemperature = readFloat(msg.m_data, &dataIndex);
 
 				break;
 
