@@ -165,9 +165,3 @@
 		checksum &= 0xff;
 		return (checksum == 0);
 	}
-
-
-
-
-
-

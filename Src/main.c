@@ -35,6 +35,8 @@
 #include "../../shared/app/sd.h"
 #include "mti.h"
 
+SemaphoreHandle_t xSemaphoreDRDY = NULL;
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -232,8 +234,17 @@ void SystemClock_Config(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == sd_detect_Pin) {
-   //   app_sd_detect_handler();
+      //app_sd_detect_handler();
+    }else if(GPIO_Pin == MTI_DRDY_Pin){
+
+    	xSemaphoreGiveFromISR( xSemaphoreDRDY, NULL );
+
     }
+}
+
+void EXTI4_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(MTI_DRDY_Pin);
 }
 
 /*uint32_t can_init()

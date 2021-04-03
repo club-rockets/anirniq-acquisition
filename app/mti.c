@@ -11,7 +11,7 @@
 #include <string.h>
 
 static XbusMessage msg;
-static uint8_t xbusMessage[2056];
+static uint8_t xbusMessage[500];
 static mti_device_state mtiState = 0;
 
 static void mti_error(){
@@ -70,9 +70,9 @@ void mti_receive(uint8_t msgId){
 
 void mti_send(uint8_t msgId){
 
-		XbusMessageCreate(&msg,msgId);
-		MtsspInterface_sendXbusMessage(&msg);
-		wait_us(5); //Wait for next transfert
+	XbusMessageCreate(&msg,msgId);
+	MtsspInterface_sendXbusMessage(&msg);
+	wait_us(5); //Wait for next transfert
 
 }
 
@@ -116,18 +116,50 @@ void config_mti(void){
 
 	memcpy(&mtiConfig, getPointerToPayload(xbusMessage), getPayloadLength(xbusMessage)); //Copy configuration of xbusMessage
 
+#if (configTRANSCRIPT_ENABLED)
+			transcript(APP_MTI_NAME,"Mti is in configuration mode",0);
+#endif
+
+	//Setup OutputConfiguration
+
 }
 
 void task_mti(void * pvParameters){
 
+	uint16_t notificationMessageSize;
+	uint16_t measurementMessageSize;
 
-	//Different task for the rocket status
+	//Go to measurement mode
+	mti_send(XMID_GotoMeasurement);
+	mti_receive(XMID_GotoMeasurementAck);
+
+	mtiState = mti_measurement; //If all is ok
+
+#if (configTRANSCRIPT_ENABLED)
+			transcript(APP_MTI_NAME,"Mti is in measurement mode",0);
+#endif
+
+	//Create binary semaphore for DRDY interrupt request
+	xSemaphoreDRDY = xSemaphoreCreateBinaryStatic( &xSemaphoreDRDYBuffer );
+	configASSERT( xSemaphoreDRDY );
+
+	//Enable the interrupt service request from DRDY
+	HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 
 	for(;;){
 
+		//Check Rocket Status
 
+		//Wait for DRDY go high
+		if( xSemaphoreTake( xSemaphoreDRDY, portMAX_DELAY ) == pdTRUE ){
 
+			//Read notification and measurement data
+			MtsspInterface_readPipeStatus(&notificationMessageSize, &measurementMessageSize);
+
+			//Check pipe
+			if( (!notificationMessageSize) && (measurementMessageSize > 0) ){
+				MtsspInterface_readFromPipe(xbusMessage+2, measurementMessageSize, XBUS_MEASUREMENT_PIPE);
+			} //else create a handle for notificationMessage
+		}
 	}
-
-
 }
