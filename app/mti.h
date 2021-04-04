@@ -13,6 +13,7 @@
 #include "xbushelpers.h"
 #include "xsdataidentifier.h"
 #include "transcript.h"
+#include "../../shared/app/sd.h"
 
 #define SAMPLING_PERIOD 50 //10-500 Hz
 

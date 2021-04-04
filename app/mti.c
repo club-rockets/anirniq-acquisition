@@ -1,12 +1,15 @@
 #include "mti.h"
 
 #include <string.h>
+#include <stdio.h>
 
 #define APP_MTI_NAME "MTI"
 
 static uint8_t xbusMessage[500];
 static mti_device_state mtiState = 0;
 static volatile mtData2 mtiData;
+//static char g_textBuffer[256];
+//static uint8_t test = 0;
 
 static void mti_error(){
 
@@ -156,6 +159,10 @@ uint8_t mti_mtData2_parse(XbusMessage msg){
 				mtiData.xdiAcceleration.y = readFloat(msg.m_data, &dataIndex);
 				mtiData.xdiAcceleration.z = readFloat(msg.m_data, &dataIndex);
 
+				sd_writeFloat("Acc X",mtiData.xdiAcceleration.x);
+				sd_writeFloat("Acc Y",mtiData.xdiAcceleration.y);
+				sd_writeFloat("Acc Z",mtiData.xdiAcceleration.z);
+
 				break;
 
 			case XDI_Temperature:
@@ -163,6 +170,8 @@ uint8_t mti_mtData2_parse(XbusMessage msg){
 				if(dataSize != sizeof(mtiData.xdiTemperature)) break;
 
 				mtiData.xdiTemperature = readFloat(msg.m_data, &dataIndex);
+
+				sd_writeFloat("Temp",mtiData.xdiTemperature);
 
 				break;
 
@@ -190,6 +199,7 @@ void task_mti(void * pvParameters){
 
 #if (configTRANSCRIPT_ENABLED)
 			transcript(APP_MTI_NAME,"Mti is in measurement mode",0);
+			transcript(APP_MTI_NAME,"Launching MTI task",0);
 #endif
 
 	for(;;){
@@ -226,6 +236,9 @@ void task_mti(void * pvParameters){
 				msg.m_mid = getMessageId(xbusMessage);
 				msg.m_length = getPayloadLength(xbusMessage);
 				msg.m_data = getPointerToPayload(xbusMessage);
+
+				//Send Data to sd card
+
 
 				//Parse data
 				mti_mtData2_parse(msg);

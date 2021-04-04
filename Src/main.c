@@ -87,7 +87,7 @@ StackType_t APP_SD_STACK[ APP_SD_SIZE ];
 /* TASK MTI*/
 #define APP_MTI_NAME "MTI"
 #define APP_MTI_PRIORITY 0
-#define APP_MTI_SIZE 192
+#define APP_MTI_SIZE 1000
 StaticTask_t APP_MTI_BUFFER;
 StackType_t APP_MTI_STACK[ APP_MTI_SIZE ];
 
