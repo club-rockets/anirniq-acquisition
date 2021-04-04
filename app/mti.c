@@ -124,6 +124,29 @@ void config_mti(void){
 
 }
 
+void read_packet(uint8_t size, , uint8_t* ptr, uint8_t* prm){
+
+	if(size != sizeof(mtiData.xdiPacketCounter)) return; //Check datasize
+	mtiData.xdiPacketCounter = readUint16(ptr, prm);
+
+}
+
+void read_acceleration(uint8_t size, , uint8_t* ptr, uint8_t* prm){
+
+	if(size != sizeof(mtiData.xdiAcceleration)) return;
+	mtiData.xdiAcceleration.x = readFloat(ptr, prm);
+	mtiData.xdiAcceleration.y = readFloat(ptr, prm);
+	mtiData.xdiAcceleration.z = readFloat(ptr, prm);
+
+}
+
+void read_temperature(uint8_t size, uint8_t* ptr, uint8_t* prm){
+
+	if(size != sizeof(mtiData.xdiTemperature)) return;
+	mtiData.xdiTemperature = readFloat(ptr, prm);
+
+}
+
 uint8_t mti_mtData2_parse(XbusMessage msg){
 
 	uint16_t dataId;
@@ -149,23 +172,11 @@ uint8_t mti_mtData2_parse(XbusMessage msg){
 
 			case XDI_PacketCounter:
 
-				if(dataSize != sizeof(mtiData.xdiPacketCounter)) break; //Check datasize
-
-				mtiData.xdiPacketCounter = readUint16(msg.m_data, &dataIndex);
 
 				break;
 
 			case XDI_Acceleration:
 
-				if(dataSize != sizeof(mtiData.xdiAcceleration)) break;
-
-				mtiData.xdiAcceleration.x = readFloat(msg.m_data, &dataIndex);
-				mtiData.xdiAcceleration.y = readFloat(msg.m_data, &dataIndex);
-				mtiData.xdiAcceleration.z = readFloat(msg.m_data, &dataIndex);
-
-				sd_writeFloat("Acc X",mtiData.xdiAcceleration.x);
-				sd_writeFloat("Acc Y",mtiData.xdiAcceleration.y);
-				sd_writeFloat("Acc Z",mtiData.xdiAcceleration.z);
 
 				break;
 
@@ -244,9 +255,20 @@ void task_mti(void * pvParameters){
 
 					if(verifyChecksum(xbusMessage))
 						mti_mtData2_parse(msg);
-
 			}
 
 			} //else create a handle for notificationMessage
 		}
 	}
+
+/*
+
+XDI_PacketCounter, 20 , "NPacket", mtiData.xdiPacketCounter, read_packet;
+XDI_Acceleration, 20, "Accel", mtiData.xdiAcceleration, read_acceleration;
+XDI_DeltaV, "dv", 20 , mtiData.xdiDeltaV, read_deltaV;
+XDI_VelocityXYZ, 20, "velocity", mtiData.xdiVelocity, read_velocity;
+XDI_RateOfTurn, 20, "ROT", mtiData.xdiRateOfTurn, read_rateOfTurn;
+XDI_EulerAngles, 20, "angle", mtiData.xdiEulerAngle, read_angle;
+XDI_Temperature, 20, "Temperature", mtiData.xdiTemperature, read_temperature;
+
+ */
