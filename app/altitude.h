@@ -1,6 +1,6 @@
 #ifndef ALTITUDE_H_
 #define ALTITUDE_H_
 
-void altitude_task(void * pvParameters);
+void task_altitude(void * pvParameters);
 
 #endif

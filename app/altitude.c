@@ -8,7 +8,7 @@
 #include "../../shared/bsp/bsp_can.h"
 #include "../../shared/drivers/can/can_driver.h"
 
-void altitude_task(void * pvParameters){
+void task_altitude(void * pvParameters){
 
     sd_data_t* data;
     can_regData_u can_data = { 0 };
