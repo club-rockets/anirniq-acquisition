@@ -71,8 +71,9 @@ Src/syscalls.c \
 Src/system_stm32f4xx.c \
 Src/usart.c \
 Src/freertos.c \
-app/blink.c \
-app/sd.c \
+app/altitude.c \
+../shared/app/blink.c \
+../shared/app/sd.c \
 Middlewares/FreeRTOS/croutine.c \
 Middlewares/FreeRTOS/event_groups.c \
 Middlewares/FreeRTOS/list.c \
