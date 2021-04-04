@@ -156,9 +156,9 @@
 	*/
 	uint8_t verifyChecksum(const uint8_t* xbusMessage)
 	{
-		int nBytes =  getRawLength(xbusMessage);
+		uint8_t nBytes =  getRawLength(xbusMessage);
 		uint8_t checksum = 0;
-		for (int n = 1; n < nBytes; n++)
+		for (uint8_t n = 1; n < nBytes; n++)
 		{
 			checksum += (xbusMessage[n] & 0xff);
 		}

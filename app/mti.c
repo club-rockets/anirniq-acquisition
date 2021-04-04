@@ -9,7 +9,7 @@ static uint8_t xbusMessage[500];
 static mti_device_state mtiState = 0;
 static volatile mtData2 mtiData;
 //static char g_textBuffer[256];
-//static uint8_t test = 0;
+static volatile uint8_t test = 0;
 
 static void mti_error(){
 
@@ -81,6 +81,7 @@ void resetDevice(void)
 
 void config_mti(void){
 
+	xbusMessage[1] = 0xff;
 	//uint8_t* xbusMsg = &xbusMessage[2];
 	mtiConfiguration mtiConfig;
 
@@ -92,7 +93,10 @@ void config_mti(void){
 	/* RECEIVE DEVICE ACKNOWLEDGE */
 
 	mti_receive(XMID_Wakeup);
-	mti_send(XMID_WakeupAck);
+
+	if(verifyChecksum(xbusMessage))
+		mti_send(XMID_WakeupAck);
+
 
 	/* GO TO CONFIG STATE */
 
@@ -224,6 +228,7 @@ void task_mti(void * pvParameters){
 				msg.m_data = getPointerToPayload(xbusMessage);
 
 				//Use case from error that can occur
+				if(verifyChecksum(xbusMessage));
 
 			}
 
@@ -232,16 +237,13 @@ void task_mti(void * pvParameters){
 
 				MtsspInterface_readFromPipe(xbusMessage+2, measurementMessageSize, XBUS_MEASUREMENT_PIPE); //Read from the pipe
 
-				//Parse message information
-				msg.m_mid = getMessageId(xbusMessage);
-				msg.m_length = getPayloadLength(xbusMessage);
-				msg.m_data = getPointerToPayload(xbusMessage);
+					//Parse message information
+					msg.m_mid = getMessageId(xbusMessage);
+					msg.m_length = getPayloadLength(xbusMessage);
+					msg.m_data = getPointerToPayload(xbusMessage);
 
-				//Send Data to sd card
-
-
-				//Parse data
-				mti_mtData2_parse(msg);
+					if(verifyChecksum(xbusMessage))
+						mti_mtData2_parse(msg);
 
 			}
 
