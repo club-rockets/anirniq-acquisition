@@ -24,6 +24,15 @@ typedef enum {
 
 }mti_device_state;
 
+typedef struct {
+
+	uint16_t id;
+	uint16_t frequency;
+	char name[20];
+	void (*callback)(uint8_t,uint8_t*,uint8_t*);
+
+}mti_api;
+
 /** 3-float tuple */
 typedef struct {
   float x, y, z;
@@ -36,6 +45,7 @@ void config_mti(void);
 void mti_send(uint8_t msgId);
 void mti_receive(uint8_t msgId);
 uint8_t mti_mtData2_parse(XbusMessage msg);
+uint8_t mti_mtData2_configure(void);
 void task_mti(void * pvParameters);
 
 #endif

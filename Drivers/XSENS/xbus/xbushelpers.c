@@ -138,15 +138,16 @@
 	*/
 	void updateChecksum(uint8_t* data, uint16_t length, uint8_t* checksum)
 	{
-		for (int i = 0; i < length; i++)
-			checksum -= data[i];
+		for (uint8_t i = 0; i < length; i++){
+			*checksum -= data[i];
+		}
 	}
 
 	/*! \brief Inserts the correct checksum in xbus message
 	*/
 	void insertChecksum(uint8_t* xbusMessage)
 	{
-		int nBytes = getRawLength(xbusMessage);
+		uint8_t nBytes = getRawLength(xbusMessage);
 		uint8_t checksum = 0;
 		updateChecksum(&xbusMessage[1], nBytes-2, &checksum);
 		xbusMessage[nBytes-1] = (checksum & 0xff);
