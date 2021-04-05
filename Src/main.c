@@ -20,7 +20,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
 #include "dma.h"
 #include "fatfs.h"
 #include "rtc.h"
@@ -31,12 +30,20 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "app_altitude.h"
-#include "app_gps.h"
-#include "app_heartbeat.h"
-#include "app_sd.h"
 
-#include "bsp_can.h"
+#include "../../shared/app/blink.h"
+#include "../../shared/app/sd.h"
+#include "mti.h"
+#include "altitude.h"
+
+#include "../../shared/bsp/bsp_can.h"
+
+SemaphoreHandle_t xSemaphoreDRDY = NULL;
+StaticSemaphore_t xSemaphoreDRDYBuffer;
+
+SemaphoreHandle_t xSemaphoreSPI = NULL;
+StaticSemaphore_t xMutexSPIBuffer;
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,13 +69,41 @@ extern canInstance_t can1Instance;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 uint32_t can_init();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+/* TASK BLINK*/
+#define APP_BLINK_NAME "BLINK"
+#define APP_BLINK_PRIORITY 0
+#define APP_BLINK_SIZE 192
+StaticTask_t APP_BLINK_BUFFER;
+StackType_t APP_BLINK_STACK[ APP_BLINK_SIZE ];
+
+/* TASK SD*/
+#define APP_SD_NAME "SD"
+#define APP_SD_PRIORITY 0
+#define APP_SD_SIZE 1000
+StaticTask_t APP_SD_BUFFER;
+StackType_t APP_SD_STACK[ APP_SD_SIZE ];
+
+/* TASK MTI*/
+#define APP_MTI_NAME "MTI"
+#define APP_MTI_PRIORITY 0
+#define APP_MTI_SIZE 1000
+StaticTask_t APP_MTI_BUFFER;
+StackType_t APP_MTI_STACK[ APP_MTI_SIZE ];
+
+/* TASK ALTITUDE*/
+#define APP_ALT_NAME "ALT"
+#define APP_ALT_PRIORITY 0
+#define APP_ALT_SIZE 1000
+StaticTask_t APP_ALT_BUFFER;
+StackType_t APP_ALT_STACK[ APP_ALT_SIZE ];
+
 /* USER CODE END 0 */
 
 /**
@@ -80,7 +115,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -106,22 +140,72 @@ int main(void)
   MX_USART1_UART_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
-  can_init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-  app_altitude_init();
-  app_gps_init();
-  app_heartbeat_init();
-  app_sd_init();
   HAL_GPIO_WritePin(CAN1_STANDBY_GPIO_Port, CAN1_STANDBY_Pin, GPIO_PIN_RESET);
+
+  config_mti();
+  config_altitude();
+
+  /* FREERTOS TASK CREATION */
+
+	//Create binary semaphore for DRDY interrupt request
+	xSemaphoreDRDY = xSemaphoreCreateBinaryStatic( &xSemaphoreDRDYBuffer );
+	configASSERT( xSemaphoreDRDY );
+
+	xSemaphoreSPI = xSemaphoreCreateMutexStatic( &xMutexSPIBuffer );
+	configASSERT( xSemaphoreSPI );
+
+  TaskHandle_t xHandle = NULL;
+
+  /* Create the task without using any dynamic memory allocation. */
+  xHandle = xTaskCreateStatic(
+           task_blink,       /* Function that implements the task. */
+           APP_BLINK_NAME,          /* Text name for the task. */
+		   APP_BLINK_SIZE,      /* Number of indexes in the xStack array. */
+           ( void * ) NULL,    /* Parameter passed into the task. */
+           APP_BLINK_PRIORITY,/* Priority at which the task is created. */
+		   APP_BLINK_STACK,          /* Array to use as the task's stack. */
+           &APP_BLINK_BUFFER );  /* Variable to hold the task's data structure. */
+
+  xHandle = xTaskCreateStatic(
+           task_sd,
+           APP_SD_NAME,
+		   APP_SD_SIZE,
+           ( void * ) NULL,
+           APP_SD_PRIORITY,
+		   APP_SD_STACK,
+           &APP_SD_BUFFER );
+
+  xHandle = xTaskCreateStatic(
+           task_mti,
+           APP_MTI_NAME,
+		   APP_MTI_SIZE,
+           ( void * ) NULL,
+           APP_MTI_PRIORITY,
+		   APP_MTI_STACK,
+           &APP_MTI_BUFFER );
+
+  xHandle = xTaskCreateStatic(
+           task_altitude,
+           APP_ALT_NAME,
+		   APP_ALT_SIZE,
+           ( void * ) NULL,
+           APP_ALT_PRIORITY,
+		   APP_ALT_STACK,
+           &APP_ALT_BUFFER );
+
+  while(HAL_GPIO_ReadPin(sd_detect_GPIO_Port, sd_detect_Pin)){
+
+	  HAL_Delay(5000);
+
+  }
+
+
+	/* Start the scheduler. */
+	vTaskStartScheduler();
+
   /* USER CODE END 2 */
-
-  /* Call init function for freertos objects (in freertos.c) */
-  MX_FREERTOS_Init();
-
-  /* Start scheduler */
-  osKernelStart();
-  
-  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -144,11 +228,11 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
-  /** Configure the main internal regulator output voltage 
+  /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE|RCC_OSCILLATORTYPE_LSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
@@ -163,7 +247,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -187,9 +271,29 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin == SD_DETECT_Pin) {
-      app_sd_detect_handler();
+
+	GPIO_PinState sdState;
+
+    if (GPIO_Pin == sd_detect_Pin) {
+
+    	sdState = HAL_GPIO_ReadPin(sd_detect_GPIO_Port, sd_detect_Pin);
+    	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, ~sdState);
+
+    }else if(GPIO_Pin == MTI_DRDY_Pin){
+
+    	xSemaphoreGiveFromISR( xSemaphoreDRDY, NULL );
+
     }
+}
+
+void EXTI4_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(MTI_DRDY_Pin);
+}
+
+void EXTI3_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(sd_detect_Pin);
 }
 
 uint32_t can_init()
@@ -269,7 +373,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */

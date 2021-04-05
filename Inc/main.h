@@ -33,7 +33,12 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "enums.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+#include "event_groups.h"
+#include "timers.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -79,9 +84,8 @@ void Error_Handler(void);
 #define LED3_GPIO_Port GPIOD
 #define LED4_Pin GPIO_PIN_15
 #define LED4_GPIO_Port GPIOD
-#define SD_DETECT_Pin GPIO_PIN_3
-#define SD_DETECT_GPIO_Port GPIOD
-#define SD_DETECT_EXTI_IRQn EXTI3_IRQn
+#define sd_detect_Pin GPIO_PIN_3
+#define sd_detect_GPIO_Port GPIOD
 #define CAN1_STANDBY_Pin GPIO_PIN_0
 #define CAN1_STANDBY_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */

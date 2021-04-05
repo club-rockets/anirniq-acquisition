@@ -35,7 +35,9 @@
 
 #include "xbusmessage.h"
 #include "main.h"
+#include "spi.h"
 
+#define MTI_SPI &hspi1
 
 void write(uint8_t opcode, uint8_t* data, int dataLength);
 void read(uint8_t opcode, uint8_t* dest, int dataLength);

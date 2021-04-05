@@ -49,6 +49,7 @@
 
 #include "../ff.h"
 
+static StaticSemaphore_t xMutexBuffer;
 
 #if _FS_REENTRANT
 /*------------------------------------------------------------------------*/
@@ -65,13 +66,9 @@ int ff_cre_syncobj (	/* 1:Function succeeded, 0:Could not create the sync object
 )
 {
 
-    int ret;
-
-    osSemaphoreDef(SEM);
-    *sobj = osSemaphoreCreate(osSemaphore(SEM), 1);
-    ret = (*sobj != NULL);
-
-    return ret;
+	   /* FreeRTOS */
+	   *sobj = xSemaphoreCreateMutexStatic( &xMutexBuffer );
+	    return (int)(*sobj != NULL);
 }
 
 
@@ -88,7 +85,7 @@ int ff_del_syncobj (	/* 1:Function succeeded, 0:Could not delete due to any erro
 	_SYNC_t sobj		/* Sync object tied to the logical drive to be deleted */
 )
 {
-    osSemaphoreDelete (sobj);
+	vSemaphoreDelete(sobj);
     return 1;
 }
 
@@ -105,14 +102,7 @@ int ff_req_grant (	/* 1:Got a grant to access the volume, 0:Could not get a gran
 	_SYNC_t sobj	/* Sync object to wait */
 )
 {
-  int ret = 0;
-
-  if(osSemaphoreWait(sobj, _FS_TIMEOUT) == osOK)
-  {
-    ret = 1;
-  }
-
-  return ret;
+	return (int)(xSemaphoreTake(sobj, _FS_TIMEOUT) == pdTRUE);
 }
 
 
@@ -127,7 +117,7 @@ void ff_rel_grant (
 	_SYNC_t sobj	/* Sync object to be signaled */
 )
 {
-  osSemaphoreRelease(sobj);
+	xSemaphoreGive(sobj);
 }
 
 #endif

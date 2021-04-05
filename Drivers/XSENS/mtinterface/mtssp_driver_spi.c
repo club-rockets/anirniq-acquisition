@@ -55,8 +55,8 @@ void write(uint8_t opcode, uint8_t* data, int dataLength)
 	buffer[1] = 0;
 	buffer[2] = 0;
 	buffer[3] = 0;
-	HAL_SPI_Transmit(&hspi2, buffer, sizeof(buffer), TIMEOUT_MS);
-	HAL_SPI_Transmit(&hspi2, (uint8_t*)data, dataLength, TIMEOUT_MS);
+	HAL_SPI_Transmit(MTI_SPI, buffer, sizeof(buffer), TIMEOUT_MS);
+	HAL_SPI_Transmit(MTI_SPI, (uint8_t*)data, dataLength, TIMEOUT_MS);
 	wait_us(4);
 	HAL_GPIO_WritePin(CHIP_SELECT_PORT, CHIP_SELECT_PIN, GPIO_PIN_SET);
 }
@@ -76,8 +76,8 @@ void read(uint8_t opcode, uint8_t* dest, int dataLength)
 	buffer[1] = 0;
 	buffer[2] = 0;
 	buffer[3] = 0;
-	HAL_SPI_Transmit(&hspi2, buffer, sizeof(buffer), TIMEOUT_MS);
-	HAL_SPI_Receive(&hspi2, dest, dataLength, TIMEOUT_MS);
+	HAL_SPI_Transmit(MTI_SPI, buffer, sizeof(buffer), TIMEOUT_MS);
+	HAL_SPI_Receive(MTI_SPI, dest, dataLength, TIMEOUT_MS);
 	wait_us(4);
 	HAL_GPIO_WritePin(CHIP_SELECT_PORT, CHIP_SELECT_PIN, GPIO_PIN_SET);
 }
@@ -91,7 +91,7 @@ void writeRaw(uint8_t* data, int dataLength)
 {
 	HAL_GPIO_WritePin(CHIP_SELECT_PORT, CHIP_SELECT_PIN, GPIO_PIN_RESET);
 	wait_us(4);
-	HAL_SPI_Transmit(&hspi2, (uint8_t*)data, dataLength, TIMEOUT_MS);
+	HAL_SPI_Transmit(MTI_SPI, (uint8_t*)data, dataLength, TIMEOUT_MS);
 	wait_us(4);
 	HAL_GPIO_WritePin(CHIP_SELECT_PORT, CHIP_SELECT_PIN, GPIO_PIN_SET);
 }

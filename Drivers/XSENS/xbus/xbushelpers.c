@@ -32,22 +32,9 @@
 
 #include "xbushelpers.h"
 
-#define OFFSET_TO_PREAMBLE		0
-#define OFFSET_TO_BID			1
-#define OFFSET_TO_MID			2
-#define OFFSET_TO_LEN			3
-#define OFFSET_TO_LEN_EXT_HI	4
-#define OFFSET_TO_LEN_EXT_LO	5
-#define OFFSET_TO_PAYLOAD		4
-#define OFFSET_TO_PAYLOAD_EXT	6
-#define LENGTH_EXTENDER_BYTE	0xFF
-#define XBUS_PREAMBLE			0xFA
-#define XBUS_CHECKSUM_SIZE		1
-
-
 	/*!	\brief Returns true if the preamble equeals 0xFA, false othersise
 	*/
-	bool checkPreamble(const uint8_t* xbusMessage)
+	uint8_t checkPreamble(const uint8_t* xbusMessage)
 	{
 		return xbusMessage[OFFSET_TO_PREAMBLE] == XBUS_PREAMBLE;
 	}
@@ -151,15 +138,16 @@
 	*/
 	void updateChecksum(uint8_t* data, uint16_t length, uint8_t* checksum)
 	{
-		for (int i = 0; i < length; i++)
-			checksum -= data[i];
+		for (uint8_t i = 0; i < length; i++){
+			*checksum -= data[i];
+		}
 	}
 
 	/*! \brief Inserts the correct checksum in xbus message
 	*/
 	void insertChecksum(uint8_t* xbusMessage)
 	{
-		int nBytes = getRawLength(xbusMessage);
+		uint8_t nBytes = getRawLength(xbusMessage);
 		uint8_t checksum = 0;
 		updateChecksum(&xbusMessage[1], nBytes-2, &checksum);
 		xbusMessage[nBytes-1] = (checksum & 0xff);
@@ -167,20 +155,14 @@
 
 	/*! \brief Verifies the checksum of aon xbus message
 	*/
-	bool verifyChecksum(const uint8_t* xbusMessage)
+	uint8_t verifyChecksum(const uint8_t* xbusMessage)
 	{
-		int nBytes =  getRawLength(xbusMessage);
+		uint8_t nBytes =  getRawLength(xbusMessage);
 		uint8_t checksum = 0;
-		for (int n = 1; n < nBytes; n++)
+		for (uint8_t n = 1; n < nBytes; n++)
 		{
 			checksum += (xbusMessage[n] & 0xff);
 		}
 		checksum &= 0xff;
 		return (checksum == 0);
 	}
-
-
-
-
-
-
