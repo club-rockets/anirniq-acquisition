@@ -158,6 +158,45 @@ static void read_acceleration(uint8_t size, uint8_t* ptr, uint8_t* prm){
 
 }
 
+static void read_deltaV(uint8_t size, uint8_t* ptr, uint8_t* prm){
+
+	if(size != sizeof(mtiData.xdiDeltaV)) return;
+	mtiData.xdiDeltaV.x = readFloat(ptr, prm);
+	mtiData.xdiDeltaV.y = readFloat(ptr, prm);
+	mtiData.xdiDeltaV.z = readFloat(ptr, prm);
+
+	sd_writeFloat("dv x",mtiData.xdiDeltaV.x);
+	sd_writeFloat("dv y",mtiData.xdiDeltaV.y);
+	sd_writeFloat("dv z",mtiData.xdiDeltaV.z);
+
+}
+
+static void read_rateOfTurn(uint8_t size, uint8_t* ptr, uint8_t* prm){
+
+	if(size != sizeof(mtiData.xdiRateOfTurn)) return;
+	mtiData.xdiRateOfTurn.x = readFloat(ptr, prm);
+	mtiData.xdiRateOfTurn.y = readFloat(ptr, prm);
+	mtiData.xdiRateOfTurn.z = readFloat(ptr, prm);
+
+	sd_writeFloat("rt x",mtiData.xdiRateOfTurn.x);
+	sd_writeFloat("rt y",mtiData.xdiRateOfTurn.y);
+	sd_writeFloat("rt z",mtiData.xdiRateOfTurn.z);
+
+}
+
+static void read_eulerAngle(uint8_t size, uint8_t* ptr, uint8_t* prm){
+
+	if(size != sizeof(mtiData.xdiEulerAngle)) return;
+	mtiData.xdiEulerAngle.pitch = readFloat(ptr, prm);
+	mtiData.xdiEulerAngle.roll = readFloat(ptr, prm);
+	mtiData.xdiEulerAngle.yaw = readFloat(ptr, prm);
+
+	sd_writeFloat("euler pitch",mtiData.xdiEulerAngle.pitch);
+	sd_writeFloat("euler roll",mtiData.xdiEulerAngle.roll);
+	sd_writeFloat("euler yaw",mtiData.xdiEulerAngle.yaw);
+
+}
+
 static void read_temperature(uint8_t size, uint8_t* ptr, uint8_t* prm){
 
 	if(size != sizeof(mtiData.xdiTemperature)) return;
@@ -173,7 +212,11 @@ mti_api mti_data[] = {
 
 		XDI_PacketCounter, 0xffff , "NPacket", read_packet,
 		XDI_Acceleration, 20 , "Accel", read_acceleration,
-		XDI_Temperature, 20 , "Temperature", read_temperature
+		XDI_DeltaV, 20, "DeltaV", read_deltaV,
+		XDI_RateOfTurn, 20, "RateTurn", read_rateOfTurn,
+		XDI_EulerAngles, 20, "Euler", read_eulerAngle,
+		XDI_Temperature, 20, "Temperature", read_temperature
+
 };
 
 /***********************
