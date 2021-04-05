@@ -95,7 +95,10 @@ Src/fatfs_platform.c \
 Middlewares/Third_Party/FatFs/src/diskio.c \
 Middlewares/Third_Party/FatFs/src/ff.c \
 Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \
-Middlewares/Third_Party/FatFs/src/option/syscall.c
+Middlewares/Third_Party/FatFs/src/option/syscall.c \
+../shared/bsp/bsp_can_regdef.c \
+../shared/bsp/bsp_can.c \
+../shared/drivers/can/can_driver.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -165,7 +168,10 @@ C_INCLUDES =  \
 -IMiddlewares/FreeRTOS/include \
 -IMiddlewares/FreeRTOS/portable/GCC/ARM_CM4F \
 -IMiddlewares/Third_Party/FatFs/src \
--I..shared/app
+-I../shared/app \
+-I../shared/bsp \
+-I../shared/drivers/can \
+-I../shared/interfaces
 
 
 # compile gcc flags

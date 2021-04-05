@@ -266,6 +266,7 @@ uint8_t mti_mtData2_parse(XbusMessage msg){
 	uint8_t dataSize;
 	uint8_t dataIndex = 0;
 	uint8_t i = 0;
+	uint8_t nb = sizeof(mti_data)/28;
 
 	//Check if it is from MTData 2
 	if(msg.m_mid != XMID_MtData2){
@@ -283,17 +284,14 @@ uint8_t mti_mtData2_parse(XbusMessage msg){
 		dataSize = readUint8(msg.m_data, &dataIndex);
 
 		//Check all data
-		if(mti_data[i].id == dataId){
+		for(i = 0; i < nb; i++){
+			if(mti_data[i].id == dataId){
 
-			mti_data[i].callback(dataSize, msg.m_data, &dataIndex);
-
-		}else{
-
-			dataIndex += dataSize; //Skip the data
-
+				mti_data[i].callback(dataSize, msg.m_data, &dataIndex);
+				break;
+			}
+			if(i == nb) dataIndex += dataSize; //Skip the data
 		}
-
-		i++; //Increment index
 	}
 	return 1;
 }

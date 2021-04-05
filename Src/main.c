@@ -35,6 +35,8 @@
 #include "../../shared/app/sd.h"
 #include "mti.h"
 
+#include "../../shared/bsp/bsp_can.h"
+
 SemaphoreHandle_t xSemaphoreDRDY = NULL;
 StaticSemaphore_t xSemaphoreDRDYBuffer;
 
@@ -58,13 +60,13 @@ StaticSemaphore_t xSemaphoreDRDYBuffer;
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-//extern canInstance_t can1Instance;
+extern canInstance_t can1Instance;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-//uint32_t can_init();
+uint32_t can_init();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -169,6 +171,13 @@ int main(void)
 		   APP_MTI_STACK,
            &APP_MTI_BUFFER );
 
+  while(HAL_GPIO_ReadPin(sd_detect_GPIO_Port, sd_detect_Pin)){
+
+	  HAL_Delay(5000);
+
+  }
+
+
 	/* Start the scheduler. */
 	vTaskStartScheduler();
 
@@ -238,8 +247,14 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+
+	GPIO_PinState sdState;
+
     if (GPIO_Pin == sd_detect_Pin) {
-      //app_sd_detect_handler();
+
+    	sdState = HAL_GPIO_ReadPin(sd_detect_GPIO_Port, sd_detect_Pin);
+    	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, ~sdState);
+
     }else if(GPIO_Pin == MTI_DRDY_Pin){
 
     	xSemaphoreGiveFromISR( xSemaphoreDRDY, NULL );
@@ -252,7 +267,12 @@ void EXTI4_IRQHandler(void)
 	HAL_GPIO_EXTI_IRQHandler(MTI_DRDY_Pin);
 }
 
-/*uint32_t can_init()
+void EXTI3_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(sd_detect_Pin);
+}
+
+uint32_t can_init()
 {
     can1Instance.instance = CAN1;
     can1Instance.debugFreeze = 0;
@@ -284,7 +304,7 @@ void EXTI4_IRQHandler(void)
 
     NVIC_SetPriority(20, 10);
     return 0;
-}*/
+}
 /* USER CODE END 4 */
 
 /**
