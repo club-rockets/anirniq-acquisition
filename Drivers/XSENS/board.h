@@ -42,14 +42,14 @@
 //#define DEBUG_PIN_2					GPIO_PIN_11
 //#define DEBUG_PIN_3					GPIO_PIN_12
 
-#define RESET_PORT					RESET_GPIO_Port
-#define RESET_PIN					RESET_Pin
+#define RESET_PORT					MTI_RESET_GPIO_Port
+#define RESET_PIN					MTI_RESET_Pin
 
-#define CHIP_SELECT_PORT			CHIP_SELECT_GPIO_Port
-#define CHIP_SELECT_PIN				CHIP_SELECT_Pin
+#define CHIP_SELECT_PORT			MTI_CS_GPIO_Port
+#define CHIP_SELECT_PIN				MTI_CS_Pin
 
-#define DATA_READY_PORT				DATA_READY_GPIO_Port
-#define DATA_READY_PIN				DATA_READY_Pin
+#define DATA_READY_PORT				MTI_DRDY_GPIO_Port
+#define DATA_READY_PIN				MTI_DRDY_Pin
 //#define DATA_READY_IRQ_NR			EXTI3_IRQn
 
 //#define PSEL0_PORT					GPIOC

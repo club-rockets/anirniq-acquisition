@@ -61,6 +61,7 @@ typedef enum
 	XBF_Uart
 } XbusBusFormat;
 
+void XbusMessageCreate(XbusMessage* msg, uint8_t mid);
 size_t XbusMessage_createRawMessage(uint8_t* dest, XbusMessage* message, XbusBusFormat format);
 
 

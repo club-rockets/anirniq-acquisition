@@ -34,8 +34,9 @@
 #define XBUS_HELPERS_H
 
 #include "main.h"
+#include "xbusdef.h"
 
-	bool checkPreamble(const uint8_t* xbusMessage);
+	uint8_t checkPreamble(const uint8_t* xbusMessage);
 
 	int  getBusId(const uint8_t* xbusMessage);
 	void setBusId(uint8_t* xbusMessage, uint8_t busId);
@@ -52,6 +53,6 @@
 	uint8_t* getPointerToPayload(uint8_t* xbusMessage);
 	void updateChecksum(uint8_t* data, uint16_t length, uint8_t* checksum);
 	void insertChecksum(uint8_t* xbusMessage);
-	bool verifyChecksum(const uint8_t* xbusMessage);
+	uint8_t verifyChecksum(const uint8_t* xbusMessage);
 
 #endif
