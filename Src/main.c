@@ -34,11 +34,15 @@
 #include "../../shared/app/blink.h"
 #include "../../shared/app/sd.h"
 #include "mti.h"
+#include "altitude.h"
 
 #include "../../shared/bsp/bsp_can.h"
 
 SemaphoreHandle_t xSemaphoreDRDY = NULL;
 StaticSemaphore_t xSemaphoreDRDYBuffer;
+
+SemaphoreHandle_t xSemaphoreSPI = NULL;
+StaticSemaphore_t xMutexSPIBuffer;
 
 /* USER CODE END Includes */
 
@@ -93,10 +97,10 @@ StackType_t APP_SD_STACK[ APP_SD_SIZE ];
 StaticTask_t APP_MTI_BUFFER;
 StackType_t APP_MTI_STACK[ APP_MTI_SIZE ];
 
-/* TASK SD*/
+/* TASK ALTITUDE*/
 #define APP_ALT_NAME "ALT"
 #define APP_ALT_PRIORITY 0
-#define APP_ALT_SIZE 192
+#define APP_ALT_SIZE 1000
 StaticTask_t APP_ALT_BUFFER;
 StackType_t APP_ALT_STACK[ APP_ALT_SIZE ];
 
@@ -141,12 +145,16 @@ int main(void)
   HAL_GPIO_WritePin(CAN1_STANDBY_GPIO_Port, CAN1_STANDBY_Pin, GPIO_PIN_RESET);
 
   config_mti();
+  config_altitude();
 
   /* FREERTOS TASK CREATION */
 
 	//Create binary semaphore for DRDY interrupt request
 	xSemaphoreDRDY = xSemaphoreCreateBinaryStatic( &xSemaphoreDRDYBuffer );
 	configASSERT( xSemaphoreDRDY );
+
+	xSemaphoreSPI = xSemaphoreCreateMutexStatic( &xMutexSPIBuffer );
+	configASSERT( xSemaphoreSPI );
 
   TaskHandle_t xHandle = NULL;
 
@@ -177,6 +185,15 @@ int main(void)
            APP_MTI_PRIORITY,
 		   APP_MTI_STACK,
            &APP_MTI_BUFFER );
+
+  xHandle = xTaskCreateStatic(
+           task_altitude,
+           APP_ALT_NAME,
+		   APP_ALT_SIZE,
+           ( void * ) NULL,
+           APP_ALT_PRIORITY,
+		   APP_ALT_STACK,
+           &APP_ALT_BUFFER );
 
   while(HAL_GPIO_ReadPin(sd_detect_GPIO_Port, sd_detect_Pin)){
 

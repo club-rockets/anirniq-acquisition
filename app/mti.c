@@ -152,9 +152,9 @@ static void read_acceleration(uint8_t size, uint8_t* ptr, uint8_t* prm){
 	mtiData.xdiAcceleration.y = readFloat(ptr, prm);
 	mtiData.xdiAcceleration.z = readFloat(ptr, prm);
 
-	sd_writeFloat("x",mtiData.xdiAcceleration.x);
-	sd_writeFloat("y",mtiData.xdiAcceleration.y);
-	sd_writeFloat("z",mtiData.xdiAcceleration.z);
+	sd_writeFloat("acceleration_x",mtiData.xdiAcceleration.x);
+	sd_writeFloat("acceleration_y",mtiData.xdiAcceleration.y);
+	sd_writeFloat("acceleration_z",mtiData.xdiAcceleration.z);
 
 }
 
@@ -165,9 +165,9 @@ static void read_deltaV(uint8_t size, uint8_t* ptr, uint8_t* prm){
 	mtiData.xdiDeltaV.y = readFloat(ptr, prm);
 	mtiData.xdiDeltaV.z = readFloat(ptr, prm);
 
-	sd_writeFloat("dv x",mtiData.xdiDeltaV.x);
-	sd_writeFloat("dv y",mtiData.xdiDeltaV.y);
-	sd_writeFloat("dv z",mtiData.xdiDeltaV.z);
+	sd_writeFloat("deltaV x",mtiData.xdiDeltaV.x);
+	sd_writeFloat("deltaV y",mtiData.xdiDeltaV.y);
+	sd_writeFloat("deltaV z",mtiData.xdiDeltaV.z);
 
 }
 
@@ -178,9 +178,9 @@ static void read_rateOfTurn(uint8_t size, uint8_t* ptr, uint8_t* prm){
 	mtiData.xdiRateOfTurn.y = readFloat(ptr, prm);
 	mtiData.xdiRateOfTurn.z = readFloat(ptr, prm);
 
-	sd_writeFloat("rt x",mtiData.xdiRateOfTurn.x);
-	sd_writeFloat("rt y",mtiData.xdiRateOfTurn.y);
-	sd_writeFloat("rt z",mtiData.xdiRateOfTurn.z);
+	sd_writeFloat("rate of turn x",mtiData.xdiRateOfTurn.x);
+	sd_writeFloat("rate of turn y",mtiData.xdiRateOfTurn.y);
+	sd_writeFloat("rate of turn z",mtiData.xdiRateOfTurn.z);
 
 }
 
@@ -191,9 +191,9 @@ static void read_eulerAngle(uint8_t size, uint8_t* ptr, uint8_t* prm){
 	mtiData.xdiEulerAngle.roll = readFloat(ptr, prm);
 	mtiData.xdiEulerAngle.yaw = readFloat(ptr, prm);
 
-	sd_writeFloat("euler pitch",mtiData.xdiEulerAngle.pitch);
-	sd_writeFloat("euler roll",mtiData.xdiEulerAngle.roll);
-	sd_writeFloat("euler yaw",mtiData.xdiEulerAngle.yaw);
+	sd_writeFloat("pitch",mtiData.xdiEulerAngle.pitch);
+	sd_writeFloat("roll",mtiData.xdiEulerAngle.roll);
+	sd_writeFloat("yaw",mtiData.xdiEulerAngle.yaw);
 
 }
 
@@ -316,13 +316,12 @@ void task_mti(void * pvParameters){
 
 	for(;;){
 
-		//Check Rocket Status
-		HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin,0);
-
 		//Wait for DRDY go high
 		if( xSemaphoreTake( xSemaphoreDRDY, portMAX_DELAY ) == pdTRUE ){
 
-			HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin,1);
+			//Wait to take the semaphore
+			while(xSemaphoreTake( xSemaphoreSPI, portMAX_DELAY ) == pdFALSE);
+
 			//Read notification and measurement data
 			MtsspInterface_readPipeStatus(&notificationMessageSize, &measurementMessageSize);
 
@@ -350,10 +349,13 @@ void task_mti(void * pvParameters){
 					msg.m_length = getPayloadLength(xbusMessage);
 					msg.m_data = getPointerToPayload(xbusMessage);
 
-					if(verifyChecksum(xbusMessage))
+					if(verifyChecksum(xbusMessage)){
 						mti_mtData2_parse(msg);
-			}
+						HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
+					}
 
+			}
+				xSemaphoreGive( xSemaphoreSPI );
 			} //else create a handle for notificationMessage
 		}
 	}

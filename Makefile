@@ -99,7 +99,18 @@ Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \
 Middlewares/Third_Party/FatFs/src/option/syscall.c \
 ../shared/bsp/bsp_can_regdef.c \
 ../shared/bsp/bsp_can.c \
-../shared/drivers/can/can_driver.c
+../shared/drivers/can/can_driver.c \
+../shared/drivers/barometer/barometer.c \
+../shared/middleware/kalman/kalman.c \
+../shared/middleware/arm_matrix/arm_mat_add_f32.c \
+../shared/middleware/arm_matrix/arm_mat_cmplx_mult_f32.c \
+../shared/middleware/arm_matrix/arm_mat_init_f32.c \
+../shared/middleware/arm_matrix/arm_mat_inverse_f32.c \
+../shared/middleware/arm_matrix/arm_mat_mult_f32.c \
+../shared/middleware/arm_matrix/arm_mat_scale_f32.c \
+../shared/middleware/arm_matrix/arm_mat_sub_f32.c \
+../shared/middleware/arm_matrix/arm_mat_trans_f32.c
+
 
 # ASM sources
 ASM_SOURCES =  \
@@ -172,7 +183,10 @@ C_INCLUDES =  \
 -I../shared/app \
 -I../shared/bsp \
 -I../shared/drivers/can \
--I../shared/interfaces
+-I../shared/drivers/barometer \
+-I../shared/interfaces \
+-I../shared/middleware/arm_matrix \
+-I../shared/middleware/kalman
 
 
 # compile gcc flags

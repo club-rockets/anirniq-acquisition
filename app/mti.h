@@ -39,6 +39,7 @@ typedef struct {
 } vec3f_t;
 
 extern SemaphoreHandle_t xSemaphoreDRDY;
+extern SemaphoreHandle_t xSemaphoreSPI;
 
 void resetDevice(void);
 void config_mti(void);
