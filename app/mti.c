@@ -97,6 +97,7 @@ void config_mti(void){
 
 	if(verifyChecksum(xbusMessage))
 		mti_send(XMID_WakeupAck);
+	else mti_error();
 
 
 	/* GO TO CONFIG STATE */
@@ -106,6 +107,8 @@ void config_mti(void){
 	while(HAL_GPIO_ReadPin(DATA_READY_PORT, DATA_READY_PIN) != GPIO_PIN_SET);
 	mti_receive(XMID_GotoConfigAck);
 
+	if(!verifyChecksum(xbusMessage)) mti_error();
+
 	mtiState = mti_configuration; //mti is now in configuration mode
 
 	/* FETCH MTI CONFIGURATION */
@@ -113,6 +116,8 @@ void config_mti(void){
 	mti_send(XMID_ReqConfiguration);
 	while(HAL_GPIO_ReadPin(DATA_READY_PORT, DATA_READY_PIN) != GPIO_PIN_SET);
 	mti_receive(XMID_Configuration); //Expected 118 bytes
+
+	if(!verifyChecksum(xbusMessage)) mti_error();
 
 	memcpy(&mtiConfig, getPointerToPayload(xbusMessage), getPayloadLength(xbusMessage)); //Copy configuration of xbusMessage
 
@@ -122,8 +127,6 @@ void config_mti(void){
 
 	//Setup OutputConfiguration
 	if(!mti_mtData2_configure()) return;
-
-
 
 }
 
@@ -184,8 +187,6 @@ uint8_t mti_mtData2_configure(void){
 
 	//See how many data we have
 	nb = sizeof(mti_data)/28;
-
-	//message(xbusMessage, 0xff, XMID_SetOutputConfiguration, 4*nb); //set payload len
 
 	uint8_t* payload = getPointerToPayload(xbusMessage);
 
